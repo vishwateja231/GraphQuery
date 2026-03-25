@@ -9,15 +9,12 @@ Dodge AI is a full-stack system that accepts natural language questions, uses LL
 ## Demo
 
 - **Live App:** : https://dodge-wheat-eight.vercel.app/   (deploy: Vercel + Render + Supabase)  
-<img src="https://github.com/user-attachments/assets/9fdceb33-8cfe-4203-a1bc-a59f37751795" width="700"/>
+<img src="https://github.com/user-attachments/assets/9fdceb33-8cfe-4203-a1bc-a59f37751795" width="600"/>
 
-<img src="https://github.com/user-attachments/assets/3a2be470-b7d2-4ef6-be73-028287acfdc9" width="700"/>
 
-<img src="https://github.com/user-attachments/assets/ffb4c87b-397e-4310-b979-77eb3bf23cbc" width="700"/>
+<img src="https://github.com/user-attachments/assets/ffb4c87b-397e-4310-b979-77eb3bf23cbc" width="600"/>
 
-<img src="https://github.com/user-attachments/assets/b91b2af5-7271-45b7-8695-303e382a648c" width="700"/>
 
-<img src="https://github.com/user-attachments/assets/946257ae-fd30-43a8-80fa-9d30de8dba03" width="700"/>
 
 
 
@@ -49,12 +46,18 @@ Dodge AI provides a natural language interface for operational analytics:
 ---
 
 ## Architecture
+## System Architecture Diagram
+<img width="2725" height="2401" alt="architecture" src="https://github.com/user-attachments/assets/a3507f8b-8d6d-40d3-b800-5ffcc6d29f8c" />
+
 
 ### Frontend (React)
 - Chat-first interface for submitting questions
 - Handles `graph`, `empty`, and `error` API response types
 - Renders graph using **React Flow** (`@xyflow/react`)
 - Displays tabular query result preview alongside graph interactions
+  
+## Graph ConstrutionLogic
+<img width="935" height="1187" alt="graph logic" src="https://github.com/user-attachments/assets/fd367e12-b491-4803-8faa-35e6aca5eddd" />
 
 ### Backend (FastAPI)
 - `/query` endpoint for natural-language query processing
@@ -70,12 +73,17 @@ Dodge AI provides a natural language interface for operational analytics:
 
 ### Dataset Used
 - **Dataset:** https://drive.google.com/file/d/1UqaLbFaveV-3MEuiUrzKydhKmkeC1iAL/view
-- 
+
+## Database Schema (ER Diagram)
+<img width="2219" height="2295" alt="er" src="https://github.com/user-attachments/assets/21450932-a283-4874-a614-08717fb797af" />
+
 ### LLM Layer (Groq + Gemini)
 - **Groq:** SQL generation from schema-grounded prompt
 - **Gemini:** business summary generation for larger result sets
 - **Fallback:** summary fallback to Groq or deterministic formatter when needed
-
+- 
+## Query Processing Flow
+<img width="5398" height="426" alt="query" src="https://github.com/user-attachments/assets/91264caa-2aaf-498c-9f74-10c7216036bb" />
 ### End-to-End Flow
 
 `User → FastAPI → Groq (SQL) → SQL Validation → PostgreSQL → Graph Builder → Gemini/Groq Summary → React UI`
