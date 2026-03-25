@@ -8,12 +8,17 @@ Dodge AI is a full-stack system that accepts natural language questions, uses LL
 
 ## Demo
 
-- **Live App:** _Coming soon_ (deploy target: Vercel + Render + Supabase)  
-- **Demo Video:** _Add link here_  
+- **Live App:** : https://dodge-wheat-eight.vercel.app/   (deploy: Vercel + Render + Supabase)  
+
 - **Screenshots:**
-  - Chat interface with natural-language query input
-  - Graph canvas showing customer → order → delivery → invoice → payment relationships
-  - Tabular result preview synchronized with graph output
+<img width="1919" height="850" alt="Screenshot 2026-03-25 105207" src="https://github.com/user-attachments/assets/9fdceb33-8cfe-4203-a1bc-a59f37751795" />
+<img width="1919" height="846" alt="Screenshot 2026-03-25 105214" src="https://github.com/user-attachments/assets/3a2be470-b7d2-4ef6-be73-028287acfdc9" />
+<img width="1919" height="761" alt="Screenshot 2026-03-25 114142" src="https://github.com/user-attachments/assets/ffb4c87b-397e-4310-b979-77eb3bf23cbc" />
+<img width="1919" height="844" alt="image" src="https://github.com/user-attachments/assets/b91b2af5-7271-45b7-8695-303e382a648c" />
+<img width="1919" height="843" alt="image" src="https://github.com/user-attachments/assets/946257ae-fd30-43a8-80fa-9d30de8dba03" />
+
+
+
 
 ---
 
