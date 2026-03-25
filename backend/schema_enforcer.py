@@ -3,10 +3,9 @@ schema_enforcer.py — Strict schema enforcement for LLM SQL generation.
 
 Responsibilities:
   1. Load & cache schema from schema.json (or live DB at startup)
-  2. Auto-correct common wrong column names before validation
-  3. Validate every table/column used in a SQL query
-  4. Build a strict schema prompt string for the LLM
-  5. Provide retry context when SQL execution fails
+  2. Validate every table/column used in a SQL query
+  3. Build a strict schema prompt string for the LLM
+  4. Provide retry context when SQL execution fails
 
 The AUTHORITATIVE table list is SAP_TABLES — phantom legacy tables
 (orders, customers, invoices, payments, deliveries, order_items) that
@@ -48,71 +47,6 @@ SAP_TABLES: Set[str] = {
     "product_plants",
     "product_storage_locations",
     "plants",
-}
-
-# ── Semantic column alias mapping (what LLMs like to hallucinate → real col) ──
-COLUMN_ALIAS_MAP: Dict[str, str] = {
-    # Customer / partner
-    "customer_id":          "customer",          # business_partners.customer
-    "partner_id":           "business_partner",
-    "partner":              "business_partner",
-    "customer_name":        "business_partner_full_name",
-    "name":                 "business_partner_full_name",
-    "full_name":            "business_partner_full_name",
-
-    # Orders
-    "order_id":             "sales_order",
-    "order_number":         "sales_order",
-    "sales_order_number":   "sales_order",
-    "order_date":           "creation_date",
-    "total_amount":         "total_net_amount",
-    "currency":             "transaction_currency",
-    "delivery_status":      "overall_delivery_status",
-    "billing_status":       "overall_ord_reltd_billg_status",
-    "customer_ref":         "sold_to_party",
-
-    # Deliveries
-    "delivery_id":          "delivery_document",
-    "delivery_number":      "delivery_document",
-    "ship_date":            "actual_goods_movement_date",
-    "picking_status":       "overall_picking_status",
-    "goods_status":         "overall_goods_movement_status",
-
-    # Billing / Invoices
-    "invoice_id":           "billing_document",
-    "invoice_number":       "billing_document",
-    "invoice_date":         "billing_document_date",
-    "invoice_amount":       "total_net_amount",
-    "invoice_type":         "billing_document_type",
-    "is_cancelled":         "billing_document_is_cancelled",
-    "accounting_doc":       "accounting_document",
-
-    # Payments
-    "payment_id":           "accounting_document",
-    "payment_date":         "clearing_date",
-    "payment_amount":       "amount_in_transaction_currency",
-    "amount":               "amount_in_transaction_currency",
-    "payment_doc":          "clearing_accounting_document",
-
-    # Products
-    "product_id":           "product",
-    "product_name":         "product_description",  # join product_descriptions
-    "material_id":          "material",
-
-    # Misc
-    "created_date":         "creation_date",
-    "last_modified":        "last_change_date",
-}
-
-# ── Table alias map (wrong table name → correct SAP table) ────────────────────
-TABLE_ALIAS_MAP: Dict[str, str] = {
-    "customers":     "business_partners",
-    "orders":        "sales_order_headers",
-    "order_items":   "sales_order_items",
-    "invoices":      "billing_document_headers",
-    "payments":      "payments_accounts_receivable",
-    "deliveries":    "outbound_delivery_headers",
-    "delivery_items":"outbound_delivery_items",
 }
 
 # ── Table join hints (to help LLM form correct JOINs) ─────────────────────────
@@ -209,41 +143,18 @@ def build_schema_prompt() -> str:
 
 
 def build_column_mapping_prompt() -> str:
-    """Build the MAPPING section injected into the LLM prompt."""
-    lines = ["COLUMN NAME MAPPING (use the RIGHT side only):"]
-    for wrong, right in sorted(COLUMN_ALIAS_MAP.items()):
-        lines.append(f"  {wrong} → {right}")
-    return "\n".join(lines)
+    """Mapping is intentionally disabled to prevent invalid auto-corrections."""
+    return (
+        "COLUMN NAME MAPPING: DISABLED.\n"
+        "Use exact table and column names from schema only."
+    )
 
 
 # ── Auto-correct ───────────────────────────────────────────────────────────────
 
 def autocorrect_sql(sql: str) -> Tuple[str, List[str]]:
-    """
-    Replace known wrong table and column names with their SAP equivalents.
-    Returns (corrected_sql, list_of_changes_made).
-    Uses whole-word regex to avoid partial replacements.
-    """
-    changes: List[str] = []
-
-    # 1. Table corrections (do tables first so column rename targets are right)
-    for wrong_table, right_table in TABLE_ALIAS_MAP.items():
-        pattern = re.compile(r"\b" + re.escape(wrong_table) + r"\b", re.IGNORECASE)
-        if pattern.search(sql):
-            sql = pattern.sub(right_table, sql)
-            changes.append(f"table: {wrong_table} → {right_table}")
-
-    # 2. Column corrections
-    for wrong_col, right_col in COLUMN_ALIAS_MAP.items():
-        pattern = re.compile(r"\b" + re.escape(wrong_col) + r"\b", re.IGNORECASE)
-        if pattern.search(sql):
-            sql = pattern.sub(right_col, sql)
-            changes.append(f"col: {wrong_col} → {right_col}")
-
-    if changes:
-        logger.info("[AUTOCORRECT] Applied %d corrections: %s", len(changes), ", ".join(changes[:6]))
-
-    return sql, changes
+    """Auto-correction is intentionally disabled. Return SQL unchanged."""
+    return sql, []
 
 
 # ── Validation ─────────────────────────────────────────────────────────────────
@@ -258,43 +169,56 @@ _SQL_RESERVED = {
     "extract", "interval", "varchar", "text", "integer", "numeric", "boolean",
 }
 
-_ALLOWED_SHORT_TOKENS = {"bp", "soh", "soi", "bdh", "bdi", "par", "od", "odi", "pr"}
-
-
 def validate_sql_columns(sql: str) -> Tuple[bool, List[str]]:
     """
-    Check every non-reserved identifier in `sql` against the loaded schema.
+    Strictly validate table and column identifiers in SQL.
     Returns (is_valid, list_of_bad_identifiers).
-
-    Validation is intentionally lenient for aliases and table-qualified refs
-    (t.column notation) — we only fail if the identifier is completely unknown
-    across ALL tables AND is longer than 3 chars (avoids alias false-positives).
     """
     schema = load_schema()
-    valid_tables = set(schema.keys())
-    valid_columns: Set[str] = set()
-    for cols in schema.values():
-        valid_columns.update(cols)
+    valid_tables = {t.lower() for t in schema.keys()}
+    table_columns = {t.lower(): {c.lower() for c in cols} for t, cols in schema.items()}
+    valid_columns: Set[str] = set().union(*table_columns.values()) if table_columns else set()
 
-    # Strip string literals so we don't check values
-    cleaned = re.sub(r"'[^']*'", "''", sql)
-    # Strip table.column qualified refs — we trust the table part separately
-    cleaned = re.sub(r"\b[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*\b", "qualified_ref", cleaned.lower())
+    cleaned = re.sub(r"'(?:''|[^'])*'", "''", sql.lower())
+    cleaned = re.sub(r'"(?:[^"]|"")*"', '""', cleaned)
 
-    tokens = set(re.findall(r"\b([a-z_][a-z0-9_]{2,})\b", cleaned))
-    tokens -= _SQL_RESERVED
-    tokens -= _ALLOWED_SHORT_TOKENS
-
+    table_aliases: Dict[str, str] = {}
+    table_refs = re.findall(
+        r"\b(from|join)\s+([a-z_][a-z0-9_]*)(?:\s+(?:as\s+)?([a-z_][a-z0-9_]*))?",
+        cleaned,
+    )
     bad: List[str] = []
-    for tok in tokens:
-        if tok in valid_tables or tok in valid_columns or tok == "qualified_ref":
+    for _, table, alias in table_refs:
+        if table not in valid_tables:
+            bad.append(table)
             continue
-        # Allow tokens that look like aliases (short, non-column-like)
-        if len(tok) <= 4:
+        table_aliases[table] = table
+        if alias and alias not in _SQL_RESERVED:
+            table_aliases[alias] = table
+
+    qualified_refs = re.findall(r"\b([a-z_][a-z0-9_]*)\.([a-z_][a-z0-9_]*)\b", cleaned)
+    for qualifier, column in qualified_refs:
+        mapped_table = table_aliases.get(qualifier)
+        if not mapped_table:
+            bad.append(f"{qualifier}.{column}")
+            continue
+        if column not in table_columns.get(mapped_table, set()):
+            bad.append(f"{qualifier}.{column}")
+
+    cleaned_unqualified = re.sub(r"\b[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*\b", " ", cleaned)
+    cleaned_unqualified = re.sub(r"\b[0-9]+(?:\.[0-9]+)?\b", " ", cleaned_unqualified)
+    tokens = re.findall(r"\b([a-z_][a-z0-9_]*)\b", cleaned_unqualified)
+    seen_tokens = set(tokens)
+    table_alias_names = set(table_aliases.keys())
+    for tok in seen_tokens:
+        if tok in _SQL_RESERVED:
+            continue
+        if tok in valid_tables or tok in valid_columns or tok in table_alias_names:
             continue
         bad.append(tok)
 
-    return (len(bad) == 0), list(bad)
+    dedup_bad = sorted(set(bad))
+    return (len(dedup_bad) == 0), dedup_bad
 
 
 def build_retry_prompt(original_question: str, failed_sql: str, error_msg: str) -> str:
