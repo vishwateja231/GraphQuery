@@ -46,6 +46,16 @@ export default function GraphView({ externalOrderQuery, onClearExternal }) {
     const [error, setError] = useState(null);
     const [selectedNodeData, setSelectedNodeData] = useState(null);
     const [graphVersion, setGraphVersion] = useState(0);
+    const [errorTimer, setErrorTimer] = useState(null);
+
+    // Auto-dismiss errors after 4 s
+    const showError = useCallback((msg) => {
+        setError(msg);
+        if (errorTimer) clearTimeout(errorTimer);
+        const t = setTimeout(() => setError(null), 4000);
+        setErrorTimer(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const applyForceLayout = useCallback((rawNodes, rawEdges) => {
         const simNodes = rawNodes.map(n => ({ ...n }));
@@ -207,13 +217,13 @@ export default function GraphView({ externalOrderQuery, onClearExternal }) {
             setGraphVersion((v) => v + 1);
 
         } catch (err) {
-            setError(err.message || 'Failed to fetch graph data.');
+            showError(err.message || 'Failed to fetch graph data.');
             setNodes([]);
             setEdges([]);
         } finally {
             setLoading(false);
         }
-    }, [orderQuery, applyForceLayout, isDark]);
+    }, [orderQuery, applyForceLayout, isDark, showError]);
 
     useEffect(() => {
         if (externalOrderQuery) {
@@ -329,9 +339,12 @@ export default function GraphView({ externalOrderQuery, onClearExternal }) {
                         />
                     </form>
                 </div>
-                <div style={{ color: 'var(--text-muted)', fontSize: 16, maxWidth: 300, textAlign: 'center' }}>
-                    Ask a question or enter an order ID to explore your data.
-                </div>
+                {error && <div className="error-toast">{error}</div>}
+                {!error && (
+                    <div style={{ color: 'var(--text-muted)', fontSize: 16, maxWidth: 300, textAlign: 'center' }}>
+                        Ask a question or enter an order ID to explore your data.
+                    </div>
+                )}
             </div>
         );
     }
@@ -340,7 +353,7 @@ export default function GraphView({ externalOrderQuery, onClearExternal }) {
         <div className="graph-container">
             {loading && (
                 <div className="graph-loading">
-                    <Loader2 size={24} className="shimmer" /> Rendering Network...
+                    <Loader2 size={24} className="shimmer" /> Loading graph...
                 </div>
             )}
 
@@ -358,9 +371,9 @@ export default function GraphView({ externalOrderQuery, onClearExternal }) {
                 </form>
             </div>
 
-                    <ReactFlow
-                        key={graphVersion}
-                        nodes={nodes}
+            <ReactFlow
+                key={graphVersion}
+                nodes={nodes}
                 edges={edges}
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}

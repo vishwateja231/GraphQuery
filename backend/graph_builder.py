@@ -71,15 +71,34 @@ def build_graph(rows: List[Dict[str, Any]]) -> Dict[str, List[Dict[str, Any]]]:
             "label": label,
         }
 
+    # Map of generic node types to the possible SAP column names that contain their IDs
+    ENTITY_COLUMNS: Dict[str, List[str]] = {
+        "customer": ["customer", "business_partner", "sold_to_party"],
+        "order":    ["sales_order"],
+        "delivery": ["delivery_document"],
+        "invoice":  ["billing_document", "invoice_reference"],
+        "payment":  ["accounting_document"],
+        "product":  ["product", "material"],
+    }
+
     for row in rows:
         entity_values: Dict[str, Any] = {}
-        for entity_type in SUPPORTED_TYPES:
-            id_key = f"{entity_type}_id"
-            if id_key in row and row.get(id_key) not in (None, ""):
-                entity_values[entity_type] = row[id_key]
-                add_node(entity_type, row[id_key], row)
+        
+        # 1. First extract generic entity IDs from the row using SAP column names
+        for entity_type, possible_cols in ENTITY_COLUMNS.items():
+            # also check the legacy *_id name just in case Aliases were used
+            possible_cols.append(f"{entity_type}_id") 
+            
+            for col in possible_cols:
+                if col in row and row[col] not in (None, ""):
+                    entity_values[entity_type] = str(row[col])
+                    break # Found the ID for this entity type in this row
 
-        # Canonical O2C chain edges when IDs are present.
+        # 2. Add nodes for any entities found in this row
+        for entity_type, entity_id in entity_values.items():
+            add_node(entity_type, entity_id, row)
+
+        # 3. Canonical O2C chain edges when IDs are present.
         add_edge("customer", entity_values.get("customer"), "order", entity_values.get("order"))
         add_edge("order", entity_values.get("order"), "delivery", entity_values.get("delivery"))
         add_edge("delivery", entity_values.get("delivery"), "invoice", entity_values.get("invoice"))
@@ -87,6 +106,6 @@ def build_graph(rows: List[Dict[str, Any]]) -> Dict[str, List[Dict[str, Any]]]:
         add_edge("invoice", entity_values.get("invoice"), "payment", entity_values.get("payment"))
         add_edge("order", entity_values.get("order"), "product", entity_values.get("product"))
 
-    graph["nodes"] = list(unique_nodes.values())
-    graph["edges"] = list(unique_edges.values())
+    graph["nodes"] = [node for node in unique_nodes.values()]
+    graph["edges"] = [edge for edge in unique_edges.values()]
     return graph

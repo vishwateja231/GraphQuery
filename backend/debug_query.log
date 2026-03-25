@@ -1,0 +1,1174 @@
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[DEBUG] build_query_response started for: show me some orders
+[GROQ] Generating SQL for: show me some orders
+[GROQ] Raw SQL: SELECT soh.sales_order AS sales_order, soh.sales_order_type AS sales_order_type, soh.sales_organizat..
+[SQL] Validated: SELECT soh.sales_order AS sales_order, soh.sales_order_type AS sales_order_type, soh.sales_organizat..
+[DEBUG] SQL generated: SELECT soh.sales_order AS sales_order, soh.sales_order_type AS sales_order_type, soh.sales_organization AS sales_organization, soh.distribution_channel AS distribution_channel, soh.organization_division AS organization_division, soh.sales_group AS sales_group, soh.sales_office AS sales_office, soh.sold_to_party AS sold_to_party, soh.total_net_amount AS total_net_amount, soh.transaction_currency AS transaction_currency, soh.requested_delivery_date AS requested_delivery_date, soh.header_billing_block_reason AS header_billing_block_reason, soh.delivery_block_reason AS delivery_block_reason, soh.incoterms_classification AS incoterms_classification, soh.incoterms_location1 AS incoterms_location1, soh.customer_payment_terms AS customer_payment_terms, soh.total_credit_check_status AS total_credit_check_status FROM sales_order_headers soh LIMIT 20
+[DB] Executing SQL…
+[DB] Got 20 rows
+[DEBUG] DB result received
+[DEBUG] Graph built: 0 nodes, 0 edges
+[GEMINI] Quota exceeded — Groq fallback
+[DEBUG] Summary generated
+[STREAM] Starting pipeline for: show me some orders
+[DEBUG] build_query_response started for: show me some orders
+[CACHE] SQL cache hit
+[DEBUG] SQL generated: SELECT soh.sales_order AS sales_order, soh.sales_order_type AS sales_order_type, soh.sales_organization AS sales_organization, soh.distribution_channel AS distribution_channel, soh.organization_division AS organization_division, soh.sales_group AS sales_group, soh.sales_office AS sales_office, soh.sold_to_party AS sold_to_party, soh.total_net_amount AS total_net_amount, soh.transaction_currency AS transaction_currency, soh.requested_delivery_date AS requested_delivery_date, soh.header_billing_block_reason AS header_billing_block_reason, soh.delivery_block_reason AS delivery_block_reason, soh.incoterms_classification AS incoterms_classification, soh.incoterms_location1 AS incoterms_location1, soh.customer_payment_terms AS customer_payment_terms, soh.total_credit_check_status AS total_credit_check_status FROM sales_order_headers soh LIMIT 20
+[CACHE] Result cache hit
+[DEBUG] DB result received
+[DEBUG] Graph built: 0 nodes, 0 edges
+[GEMINI] Quota exceeded — Groq fallback
+[DEBUG] Summary generated
+[STREAM] Payload ready, sending...
+[STREAM] Stream closed
+[STREAM] Starting pipeline for: show me the top 10 orders
+[DEBUG] build_query_response started for: show me the top 10 orders
+[GROQ] Generating SQL for: show me the top 10 orders
+[GROQ] Raw SQL: SELECT s.sold_to_party AS customer_id, s.sales_order AS order_id, s.total_net_amount AS total_amount..
+[SQL] Validated: SELECT s.sold_to_party AS customer_id, s.sales_order AS order_id, s.total_net_amount AS total_amount..
+[DEBUG] SQL generated: SELECT s.sold_to_party AS customer_id, s.sales_order AS order_id, s.total_net_amount AS total_amount FROM sales_order_headers s ORDER BY s.total_net_amount DESC LIMIT 10
+[DB] Executing SQL…
+[DB] Got 10 rows
+[DEBUG] DB result received
+[DEBUG] Graph built: 14 nodes, 10 edges
+[GEMINI] Quota exceeded — Groq fallback
+[DEBUG] Summary generated
+[STREAM] Payload ready, sending...
+[STREAM] Stream closed
+[STREAM] Starting pipeline for: show recent orders
+[DEBUG] build_query_response started for: show recent orders
+[GROQ] Generating SQL for: show recent orders
+[GROQ] Raw SQL: SELECT s.sold_to_party AS customer_id, s.sales_order AS order_id, s.creation_date AS order_date, s.t..
+[SQL] Validated: SELECT s.sold_to_party AS customer_id, s.sales_order AS order_id, s.creation_date AS order_date, s.t..
+[SQL] Too many unknown identifiers: ['s', 'order_total', 'b', 'order_id', 'customer_id', 'order_date']
+[DEBUG] SQL generated: None
+[STREAM] Payload ready, sending...
+[STREAM] Stream closed
+[STREAM] Starting pipeline for: show some customers
+[DEBUG] build_query_response started for: show some customers
+[GROQ] Generating SQL for: show some customers
+[GROQ] Raw SQL: SELECT b.business_partner AS business_partner FROM business_partners b LIMIT 20
+[SQL] Validated: SELECT b.business_partner AS business_partner FROM business_partners b LIMIT 20
+[DEBUG] SQL generated: SELECT b.business_partner AS business_partner FROM business_partners b LIMIT 20
+[DB] Executing SQL…
+[DB] Got 8 rows
+[DEBUG] DB result received
+[DEBUG] Graph built: 0 nodes, 0 edges
+[DEBUG] Summary generated
+[STREAM] Payload ready, sending...
+[STREAM] Stream closed
+[STREAM] Starting pipeline for: show this customers 320000085 details
+[DEBUG] build_query_response started for: show this customers 320000085 details
+[GROQ] Generating SQL for: show this customers 320000085 details
+[GROQ] Raw SQL: SELECT b.* FROM business_partners b JOIN customer_company_assignments c ON b.customer = c.customer J..
+[SQL] Validated: SELECT b.* FROM business_partners b JOIN customer_company_assignments c ON b.customer = c.customer J..
+[DEBUG] SQL generated: SELECT b.* FROM business_partners b JOIN customer_company_assignments c ON b.customer = c.customer JOIN customer_sales_area_assignments cs ON b.customer = cs.customer WHERE b.customer = 320000085 LIMIT 20
+[DB] Executing SQL…
+[DB] Query failed: operator does not exist: text = integer
+LINE 1: ...s cs ON b.customer = cs.customer WHERE b.customer = 32000008...
+                                                             ^
+HINT:  No operator matches the given name and argument types. You might need to add explicit type casts.
+[DEBUG] DB result received
+[STREAM] Payload ready, sending...
+[STREAM] Stream closed
+[STREAM] Starting pipeline for: show highest paid orders
+[DEBUG] build_query_response started for: show highest paid orders
+[GROQ] Generating SQL for: show highest paid orders
+[GROQ] Raw SQL: SELECT s.sold_to_party AS customer_id, s.total_net_amount AS total_net_amount FROM sales_order_heade..
+[SQL] Validated: SELECT s.sold_to_party AS customer_id, s.total_net_amount AS total_net_amount FROM sales_order_heade..
+[DEBUG] SQL generated: SELECT s.sold_to_party AS customer_id, s.total_net_amount AS total_net_amount FROM sales_order_headers s ORDER BY s.total_net_amount DESC LIMIT 20
+[DB] Executing SQL…
+[DB] Got 20 rows
+[DEBUG] DB result received
+[DEBUG] Graph built: 4 nodes, 0 edges
+[GEMINI] Quota exceeded — Groq fallback
+[DEBUG] Summary generated
+[STREAM] Payload ready, sending...
+[STREAM] Stream closed
+[STREAM] Starting pipeline for: show this customers 310000109 order id
+[DEBUG] build_query_response started for: show this customers 310000109 order id
+[GROQ] Generating SQL for: show this customers 310000109 order id
+[GROQ] Raw SQL: SELECT soh.sales_order AS order_id FROM sales_order_headers soh JOIN business_partners bp ON soh.sol..
+[SQL] Validated: SELECT soh.sales_order AS order_id FROM sales_order_headers soh JOIN business_partners bp ON soh.sol..
+[DEBUG] SQL generated: SELECT soh.sales_order AS order_id FROM sales_order_headers soh JOIN business_partners bp ON soh.sold_to_party = bp.customer WHERE bp.customer = '310000109' LIMIT 20
+[DB] Executing SQL…
+[DB] Got 2 rows
+[DEBUG] DB result received
+[DEBUG] Graph built: 2 nodes, 0 edges
+[DEBUG] Summary generated
+[STREAM] Payload ready, sending...
+[STREAM] Stream closed
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[DEBUG] build_query_response started for: show this customers 310000109 order id with all details
+[GROQ] Generating SQL for: show this customers 310000109 order id with all details
+[GROQ] Raw SQL: SELECT 
+    s.sold_to_party AS customer_id,
+    s.sales_order AS order_id,
+    s.sales_order_type AS..
+[SQL] Validated: SELECT 
+    s.sold_to_party AS customer_id,
+    s.sales_order AS order_id,
+    s.sales_order_type AS..
+[SQL] Invalid ID aliases found: ['order_item_id']
+[DEBUG] SQL generated: None
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[DEBUG] build_query_response started for: show this customers 310000109 order id with all details
+[GROQ] Generating SQL for: show this customers 310000109 order id with all details
+[GROQ] Raw SQL: SELECT 
+    s.sold_to_party AS customer_id,
+    s.sales_order AS order_id,
+    s.sales_order_type AS..
+[SQL] Validated: SELECT 
+    s.sold_to_party AS customer_id,
+    s.sales_order AS order_id,
+    s.sales_order_type AS..
+[DEBUG] SQL generated: SELECT 
+    s.sold_to_party AS customer_id,
+    s.sales_order AS order_id,
+    s.sales_order_type AS order_type,
+    s.sales_organization AS sales_organization,
+    s.distribution_channel AS distribution_channel,
+    s.organization_division AS division,
+    s.sales_group AS sales_group,
+    s.sales_office AS sales_office,
+    s.sold_to_party AS customer_name,
+    s.creation_date AS order_date,
+    s.last_change_date_time AS last_change_date,
+    s.total_net_amount AS total_amount,
+    s.transaction_currency AS currency,
+    s.requested_delivery_date AS delivery_date,
+    s.header_billing_block_reason AS billing_block_reason,
+    s.delivery_block_reason AS delivery_block_reason,
+    s.incoterms_classification AS incoterms_classification,
+    s.incoterms_location1 AS incoterms_location,
+    s.customer_payment_terms AS payment_terms,
+    s.total_credit_check_status AS credit_check_status,
+    soi.sales_order_item AS order_item_id,
+    soi.sales_order_item_category AS order_item_category,
+    soi.material AS product_id,
+    soi.requested_quantity AS requested_quantity,
+    soi.requested_quantity_unit AS requested_quantity_unit,
+    soi.transaction_currency AS order_item_currency,
+    soi.net_amount AS order_item_amount,
+    soi.material_group AS material_group,
+    soi.production_plant AS production_plant,
+    soi.storage_location AS storage_location,
+    soi.sales_document_rjcn_reason AS sales_document_rjcn_reason,
+    soi.item_billing_block_reason AS item_billing_block_reason
+   FROM 
+    sales_order_headers s
+   JOIN 
+    sales_order_items soi ON s.sales_order = soi.sales_order
+   JOIN 
+    business_partners bp ON s.sold_to_party = bp.customer
+   WHERE 
+    s.sold_to_party = '310000109' AND s.sales_order = '310000109'
+   LIMIT 20
+[DB] Executing SQL…
+[DB] Got 0 rows
+[DEBUG] DB result received
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[DEBUG] build_query_response started for: show all orders and their details for customer 310000109
+[GROQ] Generating SQL for: show all orders and their details for customer 310000109
+[GROQ] Raw SQL: SELECT 
+   sosh.sales_order AS order_id,
+   sosh.sales_order_type AS order_type,
+   sosh.sales_organ..
+[SQL] Validated: SELECT 
+   sosh.sales_order AS order_id,
+   sosh.sales_order_type AS order_type,
+   sosh.sales_organ..
+[DEBUG] SQL generated: SELECT 
+   sosh.sales_order AS order_id,
+   sosh.sales_order_type AS order_type,
+   sosh.sales_organization AS sales_organization,
+   sosh.distribution_channel AS distribution_channel,
+   sosh.organization_division AS division,
+   sosh.sales_group AS sales_group,
+   sosh.sales_office AS sales_office,
+   sosh.sold_to_party AS customer,
+   sosh.creation_date AS creation_date,
+   sosh.created_by_user AS created_by,
+   sosh.last_change_date_time AS last_change_date,
+   sosh.total_net_amount AS total_net_amount,
+   sosi.sales_order_item AS order_item_id,
+   sosi.sales_order_item_category AS order_item_category,
+   sosi.material AS product,
+   sosi.requested_quantity AS requested_quantity,
+   sosi.requested_quantity_unit AS requested_quantity_unit,
+   sosi.transaction_currency AS transaction_currency,
+   sosi.net_amount AS net_amount,
+   sosi.material_group AS material_group,
+   sosi.production_plant AS production_plant,
+   sosi.storage_location AS storage_location,
+   sosi.sales_document_rjcn_reason AS sales_document_rjcn_reason,
+   sosi.item_billing_block_reason AS item_billing_block_reason,
+   sosl.sales_order AS sales_order_id,
+   sosl.sales_order_item AS sales_order_item_id,
+   sosl.schedule_line AS schedule_line,
+   sosl.confirmed_delivery_date AS confirmed_delivery_date,
+   sosl.order_quantity_unit AS order_quantity_unit,
+   sosl.confirmed_order_qty_by_matl_avail_check AS confirmed_order_qty_by_matl_avail_check
+   FROM 
+   sales_order_headers sosh
+   JOIN sales_order_items sosi ON sosh.sales_order = sosi.sales_order
+   JOIN sales_order_schedule_lines sosl ON sosl.sales_order = sosh.sales_order AND sosl.sales_order_item = sosi.sales_order_item
+   WHERE sosh.sold_to_party = '310000109' LIMIT 20
+[DB] Executing SQL…
+[DB] Query failed: column sosl.confirmed_order_qty_by_matl_avail_check does not exist
+LINE 31:    sosl.confirmed_order_qty_by_matl_avail_check AS confirmed...
+            ^
+[DEBUG] DB result received
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[DEBUG] build_query_response started for: show this customers 310000109 order id
+[GROQ] Generating SQL for: show this customers 310000109 order id
+[GROQ] Raw SQL: SELECT o.order_id AS order_id FROM sales_order_headers o JOIN customer_sales_area_assignments csa ON..
+[SQL] Validated: SELECT o.order_id AS order_id FROM sales_order_headers o JOIN customer_sales_area_assignments csa ON..
+[DEBUG] SQL generated: SELECT o.order_id AS order_id FROM sales_order_headers o JOIN customer_sales_area_assignments csa ON o.sold_to_party = csa.customer WHERE csa.customer = '310000109' LIMIT 20
+[DB] Executing SQL…
+[DB] Query failed: column o.order_id does not exist
+LINE 1: SELECT o.order_id AS order_id FROM sales_order_headers o JOI...
+               ^
+[DEBUG] DB result received
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[DEBUG] build_query_response started for: show this customers 310000109 order id and details
+[GROQ] Generating SQL for: show this customers 310000109 order id and details
+[GROQ] Initial SQL: SELECT 
+   o.order_id AS order_id,
+   o.sales_order AS sales_order,
+   o.sales_order_type AS sales_o..
+[GROQ] Validating SQL via LLM Reviewer...
+[GROQ] Validated SQL: SELECT 
+   o.order_id AS order_id,
+   o.sales_order AS sales_order,
+   o.sales_order_type AS sales_o..
+[SQL] Validated: SELECT 
+   o.order_id AS order_id,
+   o.sales_order AS sales_order,
+   o.sales_order_type AS sales_o..
+[DEBUG] SQL generated: SELECT 
+   o.order_id AS order_id,
+   o.sales_order AS sales_order,
+   o.sales_order_type AS sales_order_type,
+   o.sales_organization AS sales_organization,
+   o.distribution_channel AS distribution_channel,
+   o.organization_division AS organization_division,
+   o.sales_group AS sales_group,
+   o.sales_office AS sales_office,
+   o.sold_to_party AS sold_to_party,
+   o.creation_date AS creation_date,
+   o.total_net_amount AS total_net_amount,
+   o.transaction_currency AS transaction_currency,
+   o.overall_delivery_status AS overall_delivery_status,
+   o.overall_ord_reltd_billg_status AS overall_ord_reltd_billg_status,
+   o.overall_sd_doc_reference_status AS overall_sd_doc_reference_status,
+   o.header_billing_block_reason AS header_billing_block_reason,
+   o.delivery_block_reason AS delivery_block_reason,
+   o.incoterms_classification AS incoterms_classification,
+   o.incoterms_location1 AS incoterms_location1,
+   o.customer_payment_terms AS customer_payment_terms,
+   o.total_credit_check_status AS total_credit_check_status,
+   soi.sales_order_item AS sales_order_item,
+   soi.sales_order_item_category AS sales_order_item_category,
+   soi.material AS material,
+   soi.requested_quantity AS requested_quantity,
+   soi.requested_quantity_unit AS requested_quantity_unit,
+   soi.transaction_currency AS transaction_currency,
+   soi.net_amount AS net_amount,
+   soi.material_group AS material_group,
+   soi.production_plant AS production_plant,
+   soi.storage_location AS storage_location,
+   soi.sales_document_rjcn_reason AS sales_document_rjcn_reason,
+   soi.item_billing_block_reason AS item_billing_block_reason,
+   sosl.sales_order AS sales_order,
+   sosl.sales_order_item AS sales_order_item,
+   sosl.schedule_line AS schedule_line,
+   sosl.confirmed_delivery_date AS confirmed_delivery_date,
+   sosl.order_quantity_unit AS order_quantity_unit,
+   sosl.confirmed_order_qty_by_matl_avail_check AS confirmed_order_qty_by_matl_avail_check,
+   o.total_net_amount AS order_details,
+   o.transaction_currency AS order_currency,
+   o.overall_delivery_status AS order_status,
+   o.header_billing_block_reason AS order_billing_block_reason,
+   o.delivery_block_reason AS order_delivery_block_reason,
+   o.incoterms_classification AS order_incoterms_classification,
+   o.incoterms_location1 AS order_incoterms_location1,
+   o.customer_payment_terms AS order_customer_payment_terms,
+   o.total_credit_check_status AS order_total_credit_check_status,
+   soi.requested_quantity AS item_requested_quantity,
+   soi.requested_quantity_unit AS item_requested_quantity_unit,
+   soi.transaction_currency AS item_transaction_currency,
+   soi.net_amount AS item_net_amount,
+   soi.material_group AS item_material_group,
+   soi.production_plant AS item_production_plant,
+   soi.storage_location AS item_storage_location,
+   soi.sales_document_rjcn_reason AS item_sales_document_rjcn_reason,
+   soi.item_billing_block_reason AS item_item_billing_block_reason,
+   sosl.confirmed_delivery_date AS item_confirmed_delivery_date,
+   sosl.order_quantity_unit AS item_order_quantity_unit,
+   sosl.confirmed_order_qty_by_matl_avail_check AS item_confirmed_order_qty_by_matl_avail_check
+   FROM sales_order_headers o
+   LEFT JOIN sales_order_items soi ON o.sales_order = soi.sales_order AND o.sales_order_item = soi.sales_order_item
+   LEFT JOIN sales_order_schedule_lines sosl ON soi.sales_order = sosl.sales_order AND soi.sales_order_item = sosl.sales_order_item
+   WHERE o.sold_to_party = '310000109'
+   LIMIT 20
+[DB] Executing SQL…
+[DB] Query failed: column o.sales_order_item does not exist
+LINE 63: ..._items soi ON o.sales_order = soi.sales_order AND o.sales_or...
+                                                              ^
+HINT:  Perhaps you meant to reference the column "soi.sales_order_item".
+[DEBUG] DB result received
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Loaded 19 tables from PostgreSQL
+[SCHEMA] Bootstrapped with 19 SAP tables via schema_enforcer
+[SCHEMA] Bootstrapped with 19 SAP tables via schema_enforcer
+[SCHEMA] Bootstrapped with 19 SAP tables via schema_enforcer
+[SCHEMA] Bootstrapped with 19 SAP tables via schema_enforcer
+[DEBUG] build_query_response started for: show top 5 business partners by sales
+[GROQ] Generating SQL for: show top 5 business partners by sales
+[GROQ] Initial SQL: SELECT bp.business_partner, soh.total_net_amount FROM sales_order_headers soh JOIN business_partners..
+[GROQ] Validating SQL via LLM Reviewer...
+[GROQ] Validated SQL: SELECT bp.business_partner_full_name, soh.total_net_amount FROM sales_order_headers soh LEFT JOIN bu..
+[SQL] Validated: SELECT bp.business_partner_full_name, soh.total_net_amount FROM sales_order_headers soh LEFT JOIN bu..
+[DEBUG] SQL generated: SELECT bp.business_partner_full_name, soh.total_net_amount FROM sales_order_headers soh LEFT JOIN business_partners bp ON soh.sold_to_party = bp.customer GROUP BY bp.business_partner_full_name ORDER BY soh.total_net_amount DESC LIMIT 5
+[DB] Executing SQL…
+[DB] Query failed: column "soh.total_net_amount" must appear in the GROUP BY clause or be used in an aggregate function
+LINE 1: SELECT bp.business_partner_full_name, soh.total_net_amount F...
+                                              ^
+[DEBUG] DB result received
+[RETRY] DB error 'column "soh.total_net_amount" must appear in the GROUP BY clause or be used in a..'. Retrying SQL generation...
+[GROQ] Retry SQL generation after error: column "soh.total_net_amount" must appear in the GROUP BY clause or be used in a..
+[GROQ] Retry SQL: SELECT bp.business_partner_full_name, SUM(soh.total_net_amount) FROM sales_order_headers soh LEFT JO..
+[SQL] Validated: SELECT bp.business_partner_full_name, SUM(soh.total_net_amount) FROM sales_order_headers soh LEFT JO..
+[RETRY] Retrying with corrected SQL: SELECT bp.business_partner_full_name, SUM(soh.total_net_amount) FROM sales_order_headers soh LEFT JO..
+[DB] Executing SQL…
+[DB] Got 5 rows
+[DEBUG] Graph built: 0 nodes, 0 edges
+[DEBUG] Summary generated
+[DEBUG] build_query_response started for: show top 5 business partners by sales
+[CACHE] SQL cache hit
+[DEBUG] SQL generated: SELECT bp.business_partner_full_name, soh.total_net_amount FROM sales_order_headers soh LEFT JOIN business_partners bp ON soh.sold_to_party = bp.customer GROUP BY bp.business_partner_full_name ORDER BY soh.total_net_amount DESC LIMIT 5
+[DB] Executing SQL…
+[DB] Query failed: column "soh.total_net_amount" must appear in the GROUP BY clause or be used in an aggregate function
+LINE 1: SELECT bp.business_partner_full_name, soh.total_net_amount F...
+                                              ^
+[DEBUG] DB result received
+[RETRY] DB error 'column "soh.total_net_amount" must appear in the GROUP BY clause or be used in a..'. Retrying SQL generation...
+[GROQ] Retry SQL generation after error: column "soh.total_net_amount" must appear in the GROUP BY clause or be used in a..
+[GROQ] Retry SQL: SELECT bp.business_partner_full_name, SUM(soh.total_net_amount) FROM sales_order_headers soh LEFT JO..
+[SQL] Validated: SELECT bp.business_partner_full_name, SUM(soh.total_net_amount) FROM sales_order_headers soh LEFT JO..
+[RETRY] Retrying with corrected SQL: SELECT bp.business_partner_full_name, SUM(soh.total_net_amount) FROM sales_order_headers soh LEFT JO..
+[CACHE] Result cache hit
+[DEBUG] Graph built: 0 nodes, 0 edges
+[DEBUG] Summary generated
+[DEBUG] build_query_response started for: show orders that are paid
+[GROQ] Generating SQL for: show orders that are paid
+[GROQ] Initial SQL: SELECT soh.sales_order, soh.sold_to_party, soh.total_net_amount FROM sales_order_headers soh JOIN pa..
+[GROQ] Validating SQL via LLM Reviewer...
+[GROQ] Validated SQL: SELECT soh.sales_order, soh.sold_to_party, soh.total_net_amount FROM sales_order_headers soh LEFT JO..
+[SQL] Validated: SELECT soh.sales_order, soh.sold_to_party, soh.total_net_amount FROM sales_order_headers soh LEFT JO..
+[DEBUG] SQL generated: SELECT soh.sales_order, soh.sold_to_party, soh.total_net_amount FROM sales_order_headers soh LEFT JOIN payments_accounts_receivable par ON soh.sales_order = par.sales_document WHERE par.clearing_date IS NOT NULL LIMIT 20
+[DB] Executing SQL…
+[DB] Got 0 rows
+[DEBUG] DB result received
+[SCHEMA] Bootstrapped with 19 SAP tables via schema_enforcer
+[GROQ] Generating SQL for: show paid orders
+[GROQ] Initial SQL: SELECT soh.sales_order, soh.sold_to_party, soh.total_net_amount FROM sales_order_headers soh JOIN cu..
+[GROQ] Validating SQL via LLM Reviewer...
+[GROQ] Validated SQL: SELECT soh.sales_order, soh.sold_to_party, soh.total_net_amount FROM sales_order_headers soh LEFT JO..
+[SQL] Validated: SELECT soh.sales_order, soh.sold_to_party, soh.total_net_amount FROM sales_order_headers soh LEFT JO..
+[SCHEMA] Bootstrapped with 19 SAP tables via schema_enforcer
+[DB] Executing SQL…
+[DB] Query failed: relation "payment_advice_results" does not exist
+LINE 1: ...rtners bp ON soh.sold_to_party = bp.customer JOIN payment_ad...
+                                                             ^
+[DEBUG] build_query_response started for: show paid orders
+[GROQ] Generating SQL for: show paid orders
+[GROQ] Initial SQL: SELECT soh.sales_order, soh.sold_to_party, soh.total_net_amount FROM sales_order_headers soh JOIN cu..
+[GROQ] Validating SQL via LLM Reviewer...
+[GROQ] Validated SQL: SELECT soh.sales_order, soh.sold_to_party, soh.total_net_amount FROM sales_order_headers soh LEFT JO..
+[SQL] Validated: SELECT soh.sales_order, soh.sold_to_party, soh.total_net_amount FROM sales_order_headers soh LEFT JO..
+[DEBUG] SQL generated: SELECT soh.sales_order, soh.sold_to_party, soh.total_net_amount FROM sales_order_headers soh LEFT JOIN customer_sales_area_assignments csa ON soh.sold_to_party = csa.customer LEFT JOIN payments_accounts_receivable par ON csa.customer = par.customer WHERE par.clearing_date IS NOT NULL LIMIT 20
+[DB] Executing SQL…
+[DB] Got 20 rows
+[DEBUG] DB result received
+[DEBUG] Graph built: 0 nodes, 0 edges
+[GEMINI] Quota exceeded — Groq fallback
+[DEBUG] Summary generated
+[SCHEMA] Bootstrapped with 19 SAP tables via schema_enforcer
+[DEBUG] build_query_response started for: show paid orders
+[GROQ] Generating SQL for: show paid orders
+[GROQ] Initial SQL: SELECT soh.sales_order, soh.sold_to_party, soh.total_net_amount FROM sales_order_headers soh JOIN cu..
+[GROQ] Validating SQL via LLM Reviewer...
+[GROQ] Validated SQL: SELECT soh.sales_order, soh.sold_to_party, soh.total_net_amount FROM sales_order_headers soh LEFT JO..
+[SQL] Validated: SELECT soh.sales_order, soh.sold_to_party, soh.total_net_amount FROM sales_order_headers soh LEFT JO..
+[DEBUG] SQL generated: SELECT soh.sales_order, soh.sold_to_party, soh.total_net_amount FROM sales_order_headers soh LEFT JOIN customer_sales_area_assignments csa ON soh.sold_to_party = csa.customer LEFT JOIN payments_accounts_receivable par ON soh.sold_to_party = par.customer AND par.clearing_date IS NOT NULL WHERE soh.sales_order_type = 'S' LIMIT 20
+[DB] Executing SQL…
+[DB] Got 0 rows
+[DEBUG] DB result received
+[STREAM] Starting pipeline for: list recent orders
+[DEBUG] build_query_response started for: list recent orders
+[GROQ] Generating SQL for: list recent orders
+[GROQ] Initial SQL: SELECT soh.sales_order, soh.sold_to_party, soh.total_net_amount FROM sales_order_headers soh WHERE s..
+[GROQ] Validating SQL via LLM Reviewer...
+[GROQ] Validated SQL: SELECT soh.sales_order, bp.business_partner_full_name, soh.total_net_amount FROM sales_order_headers..
+[SQL] Validated: SELECT soh.sales_order, bp.business_partner_full_name, soh.total_net_amount FROM sales_order_headers..
+[SQL-VALIDATE] Rejected — unknown identifiers: ['current_date']
+[DEBUG] SQL generated: None
+[STREAM] Payload ready, sending...
+[STREAM] Stream closed
+[STREAM] Starting pipeline for: list all customers
+[DEBUG] build_query_response started for: list all customers
+[GROQ] Generating SQL for: list all customers
+[GROQ] Initial SQL: SELECT bp.customer, bp.business_partner_full_name FROM business_partners bp LIMIT 20
+[GROQ] Validating SQL via LLM Reviewer...
+[GROQ] Validated SQL: SELECT bp.customer, bp.business_partner_full_name FROM business_partners bp LIMIT 20
+[SQL] Validated: SELECT bp.customer, bp.business_partner_full_name FROM business_partners bp LIMIT 20
+[DEBUG] SQL generated: SELECT bp.customer, bp.business_partner_full_name FROM business_partners bp LIMIT 20
+[DB] Executing SQL…
+[DB] Got 8 rows
+[DEBUG] DB result received
+[DEBUG] Graph built: 8 nodes, 0 edges
+[DEBUG] Summary generated
+[STREAM] Payload ready, sending...
+[STREAM] Stream closed
+[STREAM] Starting pipeline for: list some orders
+[DEBUG] build_query_response started for: list some orders
+[GROQ] Generating SQL for: list some orders
+[GROQ] Initial SQL: SELECT soh.sales_order, soh.sold_to_party, soh.total_net_amount FROM sales_order_headers soh JOIN bu..
+[GROQ] Validating SQL via LLM Reviewer...
+[DEBUG] CRASH in build_query_response: LLM timeout — Groq did not respond within 14 seconds
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\tasks.py", line 500, in wait_for
+    return fut.result()
+           ^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 441, in generate_sql_from_llm
+    val_result = await asyncio.wait_for(
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\tasks.py", line 502, in wait_for
+    raise exceptions.TimeoutError() from exc
+TimeoutError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 524, in build_query_response
+    sql = await generate_sql_from_llm(question)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 449, in generate_sql_from_llm
+    raise ValueError("LLM timeout — Groq did not respond within 14 seconds")
+ValueError: LLM timeout — Groq did not respond within 14 seconds
+
+[CRASH] LLM timeout — Groq did not respond within 14 seconds
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\tasks.py", line 500, in wait_for
+    return fut.result()
+           ^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 441, in generate_sql_from_llm
+    val_result = await asyncio.wait_for(
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\tasks.py", line 502, in wait_for
+    raise exceptions.TimeoutError() from exc
+TimeoutError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 524, in build_query_response
+    sql = await generate_sql_from_llm(question)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 449, in generate_sql_from_llm
+    raise ValueError("LLM timeout — Groq did not respond within 14 seconds")
+ValueError: LLM timeout — Groq did not respond within 14 seconds
+
+[STREAM] Error in event_stream: LLM timeout — Groq did not respond within 14 seconds
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\tasks.py", line 500, in wait_for
+    return fut.result()
+           ^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 441, in generate_sql_from_llm
+    val_result = await asyncio.wait_for(
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\tasks.py", line 502, in wait_for
+    raise exceptions.TimeoutError() from exc
+TimeoutError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 611, in event_stream
+    payload = await build_query_response(question)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 524, in build_query_response
+    sql = await generate_sql_from_llm(question)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 449, in generate_sql_from_llm
+    raise ValueError("LLM timeout — Groq did not respond within 14 seconds")
+ValueError: LLM timeout — Groq did not respond within 14 seconds
+[STREAM] Stream closed
+[STREAM] Starting pipeline for: hello
+[DEBUG] build_query_response started for: hello
+[STREAM] Payload ready, sending...
+[STREAM] Stream closed
+[STREAM] Starting pipeline for: list recent orders
+[DEBUG] build_query_response started for: list recent orders
+[CACHE] SQL cache hit
+[DEBUG] SQL generated: None
+[STREAM] Payload ready, sending...
+[STREAM] Stream closed
+[STREAM] Starting pipeline for: Which products are associated with the highest number of billing documents?
+[DEBUG] build_query_response started for: Which products are associated with the highest number of billing documents?
+[GROQ] Generating SQL for: Which products are associated with the highest number of bil..
+[GROQ] Initial SQL: SELECT p.product, COUNT(bdi.billing_document) as count FROM products p JOIN billing_document_items b..
+[GROQ] Validating SQL via LLM Reviewer...
+[GROQ] Validated SQL: SELECT p.product, COUNT(bdi.billing_document) as count FROM products p LEFT JOIN billing_document_it..
+[SQL] Validated: SELECT p.product, COUNT(bdi.billing_document) as count FROM products p LEFT JOIN billing_document_it..
+[DEBUG] SQL generated: SELECT p.product, COUNT(bdi.billing_document) as count FROM products p LEFT JOIN billing_document_items bdi ON p.product = bdi.material GROUP BY p.product ORDER BY count DESC LIMIT 20
+[DB] Executing SQL…
+[DB] Got 20 rows
+[DEBUG] DB result received
+[DEBUG] Graph built: 20 nodes, 0 edges
+[GEMINI] Quota exceeded — Groq fallback
+[DEBUG] Summary generated
+[STREAM] Payload ready, sending...
+[STREAM] Stream closed
+[STREAM] Starting pipeline for: S8907367008620  show all the details regarding this product
+[DEBUG] build_query_response started for: S8907367008620  show all the details regarding this product
+[GROQ] Generating SQL for: S8907367008620  show all the details regarding this product
+[GROQ] Initial SQL: SELECT 
+   soh.sales_order, 
+   soh.sold_to_party, 
+   soh.total_net_amount, 
+   soi.material, 
+   s..
+[GROQ] Validating SQL via LLM Reviewer...
+[GROQ] Validated SQL: SELECT 
+   soh.sales_order, 
+   soh.sold_to_party, 
+   soh.total_net_amount, 
+   soi.material, 
+   s..
+[SQL] Validated: SELECT 
+   soh.sales_order, 
+   soh.sold_to_party, 
+   soh.total_net_amount, 
+   soi.material, 
+   s..
+[DEBUG] SQL generated: SELECT 
+   soh.sales_order, 
+   soh.sold_to_party, 
+   soh.total_net_amount, 
+   soi.material, 
+   soi.requested_quantity, 
+   soi.requested_quantity_unit, 
+   soi.net_amount, 
+   pd.product_description 
+   FROM sales_order_headers soh 
+   JOIN sales_order_items soi ON soh.sales_order = soi.sales_order 
+   JOIN product_descriptions pd ON soi.material = pd.product AND pd.language = 'EN' 
+   JOIN business_partners bp ON soh.sold_to_party = bp.customer 
+   WHERE soh.sales_order = 'S8907367008620' LIMIT 20
+[DB] Executing SQL…
+[DB] Got 0 rows
+[DEBUG] DB result received
+[STREAM] Payload ready, sending...
+[STREAM] Stream closed
+[STREAM] Starting pipeline for: Which products are associated with the highest number of billing documents?
+[DEBUG] build_query_response started for: Which products are associated with the highest number of billing documents?
+[CACHE] SQL cache hit
+[DEBUG] SQL generated: SELECT p.product, COUNT(bdi.billing_document) as count FROM products p LEFT JOIN billing_document_items bdi ON p.product = bdi.material GROUP BY p.product ORDER BY count DESC LIMIT 20
+[CACHE] Result cache hit
+[DEBUG] DB result received
+[DEBUG] Graph built: 20 nodes, 0 edges
+[GEMINI] Quota exceeded — Groq fallback
+[DEBUG] Summary generated
+[STREAM] Payload ready, sending...
+[STREAM] Stream closed
+[SCHEMA] Bootstrapped with 19 SAP tables via schema_enforcer
+[STREAM] Starting pipeline for: give me list of recent orders
+[DEBUG] build_query_response started for: give me list of recent orders
+[GROQ] Generating SQL for: give me list of recent orders
+[GROQ] Initial SQL: SELECT soh.sales_order, soh.sold_to_party, soh.total_net_amount FROM sales_order_headers soh WHERE s..
+[GROQ] Validating SQL via LLM Reviewer...
+[GROQ] Validated SQL: SELECT soh.sales_order, bp.business_partner_full_name, soh.total_net_amount FROM sales_order_headers..
+[SQL] Validated: SELECT soh.sales_order, bp.business_partner_full_name, soh.total_net_amount FROM sales_order_headers..
+[SQL-VALIDATE] Rejected — unknown identifiers: ['current_date']
+[DEBUG] SQL generated: None
+[STREAM] Payload ready, sending...
+[STREAM] Stream closed
+[STREAM] Starting pipeline for: y
+[DEBUG] build_query_response started for: y
+[STREAM] Payload ready, sending...
+[STREAM] Stream closed
+[STREAM] Starting pipeline for: list of some customers
+[DEBUG] build_query_response started for: list of some customers
+[GROQ] Generating SQL for: list of some customers
+[GROQ] Initial SQL: SELECT bp.business_partner_full_name, bp.customer FROM business_partners bp LIMIT 20
+[GROQ] Validating SQL via LLM Reviewer...
+[GROQ] Validated SQL: SELECT bp.business_partner_full_name, bp.customer FROM business_partners bp LIMIT 20
+[SQL] Validated: SELECT bp.business_partner_full_name, bp.customer FROM business_partners bp LIMIT 20
+[DEBUG] SQL generated: SELECT bp.business_partner_full_name, bp.customer FROM business_partners bp LIMIT 20
+[DB] Executing SQL…
+[DB] Got 8 rows
+[DEBUG] DB result received
+[DEBUG] Graph built: 8 nodes, 0 edges
+[DEBUG] Summary generated
+[STREAM] Payload ready, sending...
+[STREAM] Stream closed
+[STREAM] Starting pipeline for: this 310000108 customers orders
+[DEBUG] build_query_response started for: this 310000108 customers orders
+[GROQ] Generating SQL for: this 310000108 customers orders
+[GROQ] Initial SQL: SELECT soh.sales_order, soh.sold_to_party, soh.total_net_amount FROM sales_order_headers soh JOIN bu..
+[GROQ] Validating SQL via LLM Reviewer...
+[DEBUG] CRASH in build_query_response: LLM timeout — Groq did not respond within 14 seconds
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\tasks.py", line 500, in wait_for
+    return fut.result()
+           ^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 441, in generate_sql_from_llm
+    val_result = await asyncio.wait_for(
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\tasks.py", line 502, in wait_for
+    raise exceptions.TimeoutError() from exc
+TimeoutError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 524, in build_query_response
+    sql = await generate_sql_from_llm(question)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 449, in generate_sql_from_llm
+    raise ValueError("LLM timeout — Groq did not respond within 14 seconds")
+ValueError: LLM timeout — Groq did not respond within 14 seconds
+
+[CRASH] LLM timeout — Groq did not respond within 14 seconds
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\tasks.py", line 500, in wait_for
+    return fut.result()
+           ^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 441, in generate_sql_from_llm
+    val_result = await asyncio.wait_for(
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\tasks.py", line 502, in wait_for
+    raise exceptions.TimeoutError() from exc
+TimeoutError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 524, in build_query_response
+    sql = await generate_sql_from_llm(question)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 449, in generate_sql_from_llm
+    raise ValueError("LLM timeout — Groq did not respond within 14 seconds")
+ValueError: LLM timeout — Groq did not respond within 14 seconds
+
+[STREAM] Error in event_stream: LLM timeout — Groq did not respond within 14 seconds
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\tasks.py", line 500, in wait_for
+    return fut.result()
+           ^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 441, in generate_sql_from_llm
+    val_result = await asyncio.wait_for(
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\tasks.py", line 502, in wait_for
+    raise exceptions.TimeoutError() from exc
+TimeoutError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 611, in event_stream
+    payload = await build_query_response(question)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 524, in build_query_response
+    sql = await generate_sql_from_llm(question)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 449, in generate_sql_from_llm
+    raise ValueError("LLM timeout — Groq did not respond within 14 seconds")
+ValueError: LLM timeout — Groq did not respond within 14 seconds
+[STREAM] Stream closed
+[STREAM] Starting pipeline for: list some orders
+[DEBUG] build_query_response started for: list some orders
+[GROQ] Generating SQL for: list some orders
+[GROQ] Initial SQL: SELECT soh.sales_order, soh.sold_to_party, soh.total_net_amount FROM sales_order_headers soh JOIN bu..
+[GROQ] Validating SQL via LLM Reviewer...
+[GROQ] Validated SQL: SELECT soh.sales_order, bp.business_partner_full_name, soh.total_net_amount FROM sales_order_headers..
+[SQL] Validated: SELECT soh.sales_order, bp.business_partner_full_name, soh.total_net_amount FROM sales_order_headers..
+[DEBUG] SQL generated: SELECT soh.sales_order, bp.business_partner_full_name, soh.total_net_amount FROM sales_order_headers soh LEFT JOIN business_partners bp ON soh.sold_to_party = bp.customer LIMIT 20
+[DB] Executing SQL…
+[DB] Got 20 rows
+[DEBUG] DB result received
+[DEBUG] Graph built: 20 nodes, 0 edges
+[STREAM] Stream closed
+[STREAM] Starting pipeline for: show all Nelson, Fitzpatrick and Jordan his orers
+[DEBUG] build_query_response started for: show all Nelson, Fitzpatrick and Jordan his orers
+[GROQ] Generating SQL for: show all Nelson, Fitzpatrick and Jordan his orers
+[GROQ] Initial SQL: SELECT soh.sales_order, soh.sold_to_party, soh.total_net_amount FROM sales_order_headers soh JOIN bu..
+[GROQ] Validating SQL via LLM Reviewer...
+[DEBUG] CRASH in build_query_response: LLM timeout — Groq did not respond within 14 seconds
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\tasks.py", line 500, in wait_for
+    return fut.result()
+           ^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 441, in generate_sql_from_llm
+    val_result = await asyncio.wait_for(
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\tasks.py", line 502, in wait_for
+    raise exceptions.TimeoutError() from exc
+TimeoutError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 524, in build_query_response
+    sql = await generate_sql_from_llm(question)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 449, in generate_sql_from_llm
+    raise ValueError("LLM timeout — Groq did not respond within 14 seconds")
+ValueError: LLM timeout — Groq did not respond within 14 seconds
+
+[CRASH] LLM timeout — Groq did not respond within 14 seconds
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\tasks.py", line 500, in wait_for
+    return fut.result()
+           ^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 441, in generate_sql_from_llm
+    val_result = await asyncio.wait_for(
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\tasks.py", line 502, in wait_for
+    raise exceptions.TimeoutError() from exc
+TimeoutError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 524, in build_query_response
+    sql = await generate_sql_from_llm(question)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 449, in generate_sql_from_llm
+    raise ValueError("LLM timeout — Groq did not respond within 14 seconds")
+ValueError: LLM timeout — Groq did not respond within 14 seconds
+
+[STREAM] Error in event_stream: LLM timeout — Groq did not respond within 14 seconds
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\tasks.py", line 500, in wait_for
+    return fut.result()
+           ^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 441, in generate_sql_from_llm
+    val_result = await asyncio.wait_for(
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\tasks.py", line 502, in wait_for
+    raise exceptions.TimeoutError() from exc
+TimeoutError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 611, in event_stream
+    payload = await build_query_response(question)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 524, in build_query_response
+    sql = await generate_sql_from_llm(question)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 449, in generate_sql_from_llm
+    raise ValueError("LLM timeout — Groq did not respond within 14 seconds")
+ValueError: LLM timeout — Groq did not respond within 14 seconds
+[STREAM] Stream closed
+[STREAM] Starting pipeline for: list recent orders
+[DEBUG] build_query_response started for: list recent orders
+[GROQ] Generating SQL for: list recent orders
+[GROQ] Initial SQL: SELECT soh.sales_order, soh.sold_to_party, soh.total_net_amount FROM sales_order_headers soh WHERE s..
+[GROQ] Validating SQL via LLM Reviewer...
+[GROQ] Validated SQL: SELECT soh.sales_order, bp.business_partner_full_name, soh.total_net_amount FROM sales_order_headers..
+[SQL] Validated: SELECT soh.sales_order, bp.business_partner_full_name, soh.total_net_amount FROM sales_order_headers..
+[SQL-VALIDATE] Rejected — unknown identifiers: ['current_date']
+[DEBUG] SQL generated: None
+[STREAM] Payload ready, sending...
+[STREAM] Stream closed
+[STREAM] Starting pipeline for: list all the addresses
+[DEBUG] build_query_response started for: list all the addresses
+[GROQ] Generating SQL for: list all the addresses
+[GROQ] Initial SQL: SELECT business_partner, address_id, validity_start_date, validity_end_date, address_uuid, address_t..
+[GROQ] Validating SQL via LLM Reviewer...
+[GROQ] Validated SQL: SELECT business_partner_full_name, address_id, validity_start_date, validity_end_date, address_uuid,..
+[SQL] Validated: SELECT business_partner_full_name, address_id, validity_start_date, validity_end_date, address_uuid,..
+[DEBUG] SQL generated: SELECT business_partner_full_name, address_id, validity_start_date, validity_end_date, address_uuid, address_time_zone, city_name, country, po_box, po_box_deviating_city_name, po_box_deviating_country, po_box_deviating_region, po_box_is_without_number, po_box_lobby_name, po_box_postal_code, postal_code, region, street_name, tax_jurisdiction, transport_zone FROM business_partner_addresses LIMIT 20
+[DB] Executing SQL…
+[DB] Query failed: column "business_partner_full_name" does not exist
+LINE 1: SELECT business_partner_full_name, address_id, validity_star...
+               ^
+[DEBUG] DB result received
+[RETRY] DB error 'column "business_partner_full_name" does not exist
+LINE 1: SELECT business_partn..'. Retrying SQL generation...
+[GROQ] Retry SQL generation after error: column "business_partner_full_name" does not exist
+LINE 1: SELECT business_partn..
+[GROQ] Retry SQL: SELECT business_partner_full_name, address_id, validity_start_date, validity_end_date, address_uuid,..
+[SQL] Validated: SELECT business_partner_full_name, address_id, validity_start_date, validity_end_date, address_uuid,..
+[STREAM] Payload ready, sending...
+[STREAM] Stream closed
+[STREAM] Starting pipeline for: list all the owners
+[DEBUG] build_query_response started for: list all the owners
+[GROQ] Generating SQL for: list all the owners
+[GROQ] Initial SQL: SELECT bp.business_partner_full_name FROM business_partners bp LIMIT 20
+[GROQ] Validating SQL via LLM Reviewer...
+[DEBUG] CRASH in build_query_response: LLM timeout — Groq did not respond within 14 seconds
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\tasks.py", line 500, in wait_for
+    return fut.result()
+           ^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 441, in generate_sql_from_llm
+    val_result = await asyncio.wait_for(
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\tasks.py", line 502, in wait_for
+    raise exceptions.TimeoutError() from exc
+TimeoutError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 524, in build_query_response
+    sql = await generate_sql_from_llm(question)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 449, in generate_sql_from_llm
+    raise ValueError("LLM timeout — Groq did not respond within 14 seconds")
+ValueError: LLM timeout — Groq did not respond within 14 seconds
+
+[CRASH] LLM timeout — Groq did not respond within 14 seconds
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\tasks.py", line 500, in wait_for
+    return fut.result()
+           ^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 441, in generate_sql_from_llm
+    val_result = await asyncio.wait_for(
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\tasks.py", line 502, in wait_for
+    raise exceptions.TimeoutError() from exc
+TimeoutError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 524, in build_query_response
+    sql = await generate_sql_from_llm(question)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 449, in generate_sql_from_llm
+    raise ValueError("LLM timeout — Groq did not respond within 14 seconds")
+ValueError: LLM timeout — Groq did not respond within 14 seconds
+
+[STREAM] Error in event_stream: LLM timeout — Groq did not respond within 14 seconds
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\tasks.py", line 500, in wait_for
+    return fut.result()
+           ^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 441, in generate_sql_from_llm
+    val_result = await asyncio.wait_for(
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\tasks.py", line 502, in wait_for
+    raise exceptions.TimeoutError() from exc
+TimeoutError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 611, in event_stream
+    payload = await build_query_response(question)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 524, in build_query_response
+    sql = await generate_sql_from_llm(question)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 449, in generate_sql_from_llm
+    raise ValueError("LLM timeout — Groq did not respond within 14 seconds")
+ValueError: LLM timeout — Groq did not respond within 14 seconds
+[STREAM] Stream closed
+[SCHEMA] Bootstrapped with 19 SAP tables via schema_enforcer
+[STREAM] Starting pipeline for: Identify sales orders that have broken or incomplete flows
+[DEBUG] build_query_response started for: Identify sales orders that have broken or incomplete flows
+[GROQ] Generating SQL for: Identify sales orders that have broken or incomplete flows
+[GROQ] Initial SQL: SELECT soh.sales_order, soh.sold_to_party, soh.total_net_amount FROM sales_order_headers soh WHERE s..
+[GROQ] Validating SQL via LLM Reviewer...
+[GROQ] Validated SQL: SELECT soh.sales_order, bp.business_partner_full_name, soh.total_net_amount FROM sales_order_headers..
+[SQL] Validated: SELECT soh.sales_order, bp.business_partner_full_name, soh.total_net_amount FROM sales_order_headers..
+[DEBUG] SQL generated: SELECT soh.sales_order, bp.business_partner_full_name, soh.total_net_amount FROM sales_order_headers soh LEFT JOIN business_partners bp ON soh.sold_to_party = bp.customer WHERE soh.overall_delivery_status = 'B' OR soh.overall_delivery_status = 'I' LIMIT 20
+[DB] Executing SQL…
+[DB] Got 0 rows
+[DEBUG] DB result received
+[STREAM] Payload ready, sending...
+[STREAM] Stream closed
+[STREAM] Starting pipeline for: show recent orders
+[DEBUG] build_query_response started for: show recent orders
+[GROQ] Generating SQL for: show recent orders
+[GROQ] Initial SQL: SELECT soh.sales_order, soh.sold_to_party, soh.total_net_amount FROM sales_order_headers soh WHERE s..
+[GROQ] Validating SQL via LLM Reviewer...
+[GROQ] Validated SQL: SELECT soh.sales_order, bp.business_partner_full_name, soh.total_net_amount FROM sales_order_headers..
+[SQL] Validated: SELECT soh.sales_order, bp.business_partner_full_name, soh.total_net_amount FROM sales_order_headers..
+[SQL-VALIDATE] Rejected — unknown identifiers: ['current_date']
+[DEBUG] SQL generated: None
+[STREAM] Payload ready, sending...
+[STREAM] Stream closed
+[STREAM] Starting pipeline for: Identify sales orders that have broken or incomplete flows
+[DEBUG] build_query_response started for: Identify sales orders that have broken or incomplete flows
+[CACHE] SQL cache hit
+[DEBUG] SQL generated: SELECT soh.sales_order, bp.business_partner_full_name, soh.total_net_amount FROM sales_order_headers soh LEFT JOIN business_partners bp ON soh.sold_to_party = bp.customer WHERE soh.overall_delivery_status = 'B' OR soh.overall_delivery_status = 'I' LIMIT 20
+[CACHE] Result cache hit
+[DEBUG] DB result received
+[STREAM] Payload ready, sending...
+[STREAM] Stream closed
+[STREAM] Starting pipeline for: show orders
+[DEBUG] build_query_response started for: show orders
+[GROQ] Generating SQL for: show orders
+[GROQ] Initial SQL: SELECT soh.sales_order, soh.sold_to_party, soh.total_net_amount FROM sales_order_headers soh JOIN bu..
+[GROQ] Validating SQL via LLM Reviewer...
+[GROQ] Validated SQL: SELECT soh.sales_order, bp.business_partner_full_name, soh.total_net_amount FROM sales_order_headers..
+[SQL] Validated: SELECT soh.sales_order, bp.business_partner_full_name, soh.total_net_amount FROM sales_order_headers..
+[DEBUG] SQL generated: SELECT soh.sales_order, bp.business_partner_full_name, soh.total_net_amount FROM sales_order_headers soh LEFT JOIN business_partners bp ON soh.sold_to_party = bp.customer WHERE bp.business_partner_full_name = 'John Doe' LIMIT 20
+[DB] Executing SQL…
+[DB] Got 0 rows
+[DEBUG] DB result received
+[STREAM] Payload ready, sending...
+[STREAM] Stream closed
+[STREAM] Starting pipeline for: show customer details
+[DEBUG] build_query_response started for: show customer details
+[GROQ] Generating SQL for: show customer details
+[GROQ] Initial SQL: SELECT bp.business_partner_full_name, bp.customer, soh.sales_order, soh.sold_to_party, soh.total_net..
+[GROQ] Validating SQL via LLM Reviewer...
+[DEBUG] CRASH in build_query_response: LLM timeout — Groq did not respond within 14 seconds
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\tasks.py", line 500, in wait_for
+    return fut.result()
+           ^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 441, in generate_sql_from_llm
+    val_result = await asyncio.wait_for(
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\tasks.py", line 502, in wait_for
+    raise exceptions.TimeoutError() from exc
+TimeoutError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 524, in build_query_response
+    sql = await generate_sql_from_llm(question)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 449, in generate_sql_from_llm
+    raise ValueError("LLM timeout — Groq did not respond within 14 seconds")
+ValueError: LLM timeout — Groq did not respond within 14 seconds
+
+[CRASH] LLM timeout — Groq did not respond within 14 seconds
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\tasks.py", line 500, in wait_for
+    return fut.result()
+           ^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 441, in generate_sql_from_llm
+    val_result = await asyncio.wait_for(
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\tasks.py", line 502, in wait_for
+    raise exceptions.TimeoutError() from exc
+TimeoutError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 524, in build_query_response
+    sql = await generate_sql_from_llm(question)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 449, in generate_sql_from_llm
+    raise ValueError("LLM timeout — Groq did not respond within 14 seconds")
+ValueError: LLM timeout — Groq did not respond within 14 seconds
+
+[STREAM] Error in event_stream: LLM timeout — Groq did not respond within 14 seconds
+Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\tasks.py", line 500, in wait_for
+    return fut.result()
+           ^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 441, in generate_sql_from_llm
+    val_result = await asyncio.wait_for(
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\tasks.py", line 502, in wait_for
+    raise exceptions.TimeoutError() from exc
+TimeoutError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 611, in event_stream
+    payload = await build_query_response(question)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 524, in build_query_response
+    sql = await generate_sql_from_llm(question)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\vishw\Downloads\Dodge Ai Assignment\backend\routers\query.py", line 449, in generate_sql_from_llm
+    raise ValueError("LLM timeout — Groq did not respond within 14 seconds")
+ValueError: LLM timeout — Groq did not respond within 14 seconds
+[STREAM] Stream closed
+[SCHEMA] Bootstrapped with 19 SAP tables via schema_enforcer
+[STREAM] Starting pipeline for: show me the latest orders
+[DEBUG] build_query_response started for: show me the latest orders
+[GROQ] Generating SQL for: show me the latest orders
+[GROQ] Initial SQL: SELECT soh.sales_order, soh.sold_to_party, soh.total_net_amount FROM sales_order_headers soh WHERE s..
+[GROQ] Validating SQL via LLM Reviewer...
+[GROQ] Validated SQL: SELECT soh.sales_order, bp.business_partner_full_name, soh.total_net_amount FROM sales_order_headers..
+[SQL] Validated: SELECT soh.sales_order, bp.business_partner_full_name, soh.total_net_amount FROM sales_order_headers..
+[DEBUG] SQL generated: SELECT soh.sales_order, bp.business_partner_full_name, soh.total_net_amount FROM sales_order_headers soh LEFT JOIN business_partners bp ON soh.sold_to_party = bp.customer WHERE soh.creation_date = ( SELECT MAX(creation_date) FROM sales_order_headers ) LIMIT 20
+[DB] Executing SQL…
+[DB] Got 20 rows
+[DEBUG] DB result received
+[DEBUG] Graph built: 20 nodes, 0 edges
+[GEMINI] Quota exceeded — Groq fallback
+[DEBUG] Summary generated
+[STREAM] Payload ready, sending...
+[STREAM] Stream closed

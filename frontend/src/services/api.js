@@ -7,14 +7,14 @@ const api = axios.create({
 });
 
 export const fetchOrderFlow = (orderId) =>
-    api.get(`/orders/${orderId}/flow`).then((r) => r.data);
+    api.get(`/orders/${orderId}/flow/`).then((r) => r.data);
 
 export const sendQuery = (question) =>
-    api.post('/query', { question }).then((r) => r.data);
+    api.post('/query/', { question }).then((r) => r.data);
 
 export const sendQueryStream = async (question, onStatus) => {
     const base = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
-    const url = `${base}/query/stream`;
+    const url = `${base}/query/stream/`;
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 60000);
     const res = await fetch(url, {

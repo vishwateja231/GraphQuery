@@ -3,12 +3,38 @@ import { sendQuery, sendQueryStream } from '../services/api';
 import { Loader2, Send } from 'lucide-react';
 import TableView from './TableView';
 
+/** Remove markdown pipe-tables and render **bold** spans */
+const renderSummary = (text) => {
+    if (!text) return <span>Query completed.</span>;
+    // Strip lines that are part of markdown tables (start with | or ---)
+    const cleanLines = text
+        .split('\n')
+        .filter(line => {
+            const stripped = line.trim();
+            return !(stripped.startsWith('|') || /^[-| ]+$/.test(stripped));
+        });
+    // Remove trailing empty lines
+    while (cleanLines.length && !cleanLines[cleanLines.length - 1].trim()) cleanLines.pop();
+    const cleaned = cleanLines.join('\n');
+    // Render **bold** spans
+    const parts = cleaned.split(/\*\*(.*?)\*\*/g);
+    return (
+        <span>
+            {parts.map((part, i) =>
+                i % 2 === 1
+                    ? <strong key={i}>{part}</strong>
+                    : part
+            )}
+        </span>
+    );
+};
+
 const GraphMessage = ({ payload, onEntityDetect }) => {
     const [showTable, setShowTable] = useState(true);
 
     return (
         <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <div style={{ whiteSpace: 'pre-wrap' }}>{payload.summary || 'Query completed.'}</div>
+            <div style={{ lineHeight: '1.6' }}>{renderSummary(payload.summary)}</div>
 
             {showTable && payload.data && payload.data.length > 0 && (
                 <TableView data={payload.data} />

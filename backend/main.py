@@ -12,7 +12,7 @@ from fastapi.responses import JSONResponse  # pyre-ignore[21]
 
 from database import close_db_pool, init_db_pool  # pyre-ignore[21]
 from routers import orders, customers, products, analytics, query  # pyre-ignore[21]
-from routers.query import LIVE_SCHEMA, load_schema_from_db  # pyre-ignore[21]
+from routers.query import LIVE_SCHEMA  # pyre-ignore[21]
 
 app = FastAPI(
     title="SAP O2C API",
@@ -28,13 +28,13 @@ app.add_middleware(
 )
 
 
-@app.exception_handler(Exception)
-async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
-    logging.error("Unhandled exception: %s", exc, exc_info=True)
-    return JSONResponse(
-        status_code=500,
-        content={"error": "Internal error", "details": str(exc)},
-    )
+# @app.exception_handler(Exception)
+# async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+#     logging.error("Unhandled exception: %s", exc, exc_info=True)
+#     return JSONResponse(
+#         status_code=500,
+#         content={"error": "Internal error", "details": str(exc)},
+#     )
 
 
 app.include_router(customers.router, prefix="/customers", tags=["Customers"])
@@ -47,15 +47,18 @@ app.include_router(query.router,     prefix="/query",     tags=["LLM Query"])
 @app.on_event("startup")
 async def startup_event() -> None:
     init_db_pool()
-    # Step 1: Load live schema from PostgreSQL once at startup
-    schema = load_schema_from_db()
-    LIVE_SCHEMA.update(schema)
     logging.info("[STARTUP] Loaded schema with %d tables", len(LIVE_SCHEMA.get("tables", {})))
 
 
 @app.on_event("shutdown")
 async def shutdown_event() -> None:
     close_db_pool()
+
+
+@app.post("/test-query/")
+async def test_query_direct(request: Request):
+    print("DEBUG: Direct test query reached")
+    return {"status": "ok"}
 
 
 @app.get("/", tags=["Health"])
