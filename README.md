@@ -9,10 +9,17 @@ Dodge AI is a full-stack system that accepts natural language questions, uses LL
 ## Demo
 
 - **Live App:** : https://dodge-wheat-eight.vercel.app/   (deploy: Vercel + Render + Supabase)  
-<img src="https://github.com/user-attachments/assets/9fdceb33-8cfe-4203-a1bc-a59f37751795" width="600"/>
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/9fdceb33-8cfe-4203-a1bc-a59f37751795" 
+       width="600"
+       style="border: 2px solid #e1e4e8; border-radius: 10px; padding: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 20px;" />
+</p>
 
-
-<img src="https://github.com/user-attachments/assets/ffb4c87b-397e-4310-b979-77eb3bf23cbc" width="600"/>
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/ffb4c87b-397e-4310-b979-77eb3bf23cbc" 
+       width="600"
+       style="border: 2px solid #e1e4e8; border-radius: 10px; padding: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
+</p>
 
 
 
