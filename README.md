@@ -9,14 +9,15 @@ Dodge AI is a full-stack system that accepts natural language questions, uses LL
 ## Demo
 
 - **Live App:** : https://dodge-wheat-eight.vercel.app/   (deploy: Vercel + Render + Supabase)  
+<img src="https://github.com/user-attachments/assets/9fdceb33-8cfe-4203-a1bc-a59f37751795" width="700"/>
 
-- **Screenshots:**
-<img width="1919" height="850" alt="Screenshot 2026-03-25 105207" src="https://github.com/user-attachments/assets/9fdceb33-8cfe-4203-a1bc-a59f37751795" />
-<img width="1919" height="846" alt="Screenshot 2026-03-25 105214" src="https://github.com/user-attachments/assets/3a2be470-b7d2-4ef6-be73-028287acfdc9" />
-<img width="1919" height="761" alt="Screenshot 2026-03-25 114142" src="https://github.com/user-attachments/assets/ffb4c87b-397e-4310-b979-77eb3bf23cbc" />
-<img width="1919" height="844" alt="image" src="https://github.com/user-attachments/assets/b91b2af5-7271-45b7-8695-303e382a648c" />
-<img width="1919" height="843" alt="image" src="https://github.com/user-attachments/assets/946257ae-fd30-43a8-80fa-9d30de8dba03" />
+<img src="https://github.com/user-attachments/assets/3a2be470-b7d2-4ef6-be73-028287acfdc9" width="700"/>
 
+<img src="https://github.com/user-attachments/assets/ffb4c87b-397e-4310-b979-77eb3bf23cbc" width="700"/>
+
+<img src="https://github.com/user-attachments/assets/b91b2af5-7271-45b7-8695-303e382a648c" width="700"/>
+
+<img src="https://github.com/user-attachments/assets/946257ae-fd30-43a8-80fa-9d30de8dba03" width="700"/>
 
 
 
@@ -67,6 +68,9 @@ Dodge AI provides a natural language interface for operational analytics:
 - Connection pooling via `psycopg_pool`
 - Indexed for core query paths (orders/customer/order-flow joins)
 
+### Dataset Used
+- **Dataset:** https://drive.google.com/file/d/1UqaLbFaveV-3MEuiUrzKydhKmkeC1iAL/view
+- 
 ### LLM Layer (Groq + Gemini)
 - **Groq:** SQL generation from schema-grounded prompt
 - **Gemini:** business summary generation for larger result sets
