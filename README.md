@@ -54,7 +54,7 @@ Dodge AI provides a natural language interface for operational analytics:
 
 ## Architecture
 ## System Architecture Diagram
-<img width="2725" height="2401" alt="architecture" src="https://github.com/user-attachments/assets/a3507f8b-8d6d-40d3-b800-5ffcc6d29f8c" />
+<img width="1200" height="900" alt="architecture" src="https://github.com/user-attachments/assets/a3507f8b-8d6d-40d3-b800-5ffcc6d29f8c" />
 
 
 ### Frontend (React)
@@ -82,7 +82,7 @@ Dodge AI provides a natural language interface for operational analytics:
 - **Dataset:** https://drive.google.com/file/d/1UqaLbFaveV-3MEuiUrzKydhKmkeC1iAL/view
 
 ## Database Schema (ER Diagram)
-<img width="2219" height="2295" alt="er" src="https://github.com/user-attachments/assets/21450932-a283-4874-a614-08717fb797af" />
+<img width="1309" height="1505" alt="er" src="https://github.com/user-attachments/assets/21450932-a283-4874-a614-08717fb797af" />
 
 ### LLM Layer (Groq + Gemini)
 - **Groq:** SQL generation from schema-grounded prompt
