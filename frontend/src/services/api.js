@@ -7,20 +7,22 @@ const api = axios.create({
 });
 
 export const fetchOrderFlow = (orderId) =>
-    api.get(`/orders/${orderId}/flow`).then((r) => r.data);
+    api.get(`/orders/${orderId}/flow/`).then((r) => r.data);
 
 export const sendQuery = (question) =>
     api.post('/query/', { question }).then((r) => r.data);
 
 export const sendQueryStream = async (question, onStatus) => {
     const base = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
-    const url = `${base}/query/stream`;
+    const url = `${base}/query/stream/`;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 60000);
     const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-    timeout: 60000,
+        signal: controller.signal,
         body: JSON.stringify({ question }),
-    });
+    }).finally(() => clearTimeout(timeout));
     if (!res.ok || !res.body) {
         throw new Error('Streaming request failed.');
     }
@@ -53,16 +55,7 @@ export const sendQueryStream = async (question, onStatus) => {
         }
     }
 
-    return finalPayload || { type: 'error', answer: 'No response from stream endpoint.' };
-};
-
-export const fetchQueryPage = async (queryId, page) => {
-    try {
-        const response = await api.get(`query/${queryId}?page=${page}`);
-        return response.data;
-    } catch (error) {
-        return { error: 'Failed to retrieve additional rows.' };
-    }
+    return finalPayload || { type: 'error', message: 'No response from stream endpoint.' };
 };
 
 export const fetchPipelineSummary = () =>

@@ -3,51 +3,48 @@ import { sendQuery, sendQueryStream } from '../services/api';
 import { Loader2, Send } from 'lucide-react';
 import TableView from './TableView';
 
-// Sub-component for rendering AI list messages with internal toggle state
-const ListMessage = ({ p, msgId, onEntityDetect }) => {
-    // Default table to open so user sees data immediately
-    const [showTable, setShowTable] = useState(true);
+/** Remove markdown pipe-tables and render **bold** spans */
+const renderSummary = (text) => {
+    if (!text) return <span>Query completed.</span>;
+    // Strip lines that are part of markdown tables (start with | or ---)
+    const cleanLines = text
+        .split('\n')
+        .filter(line => {
+            const stripped = line.trim();
+            return !(stripped.startsWith('|') || /^[-| ]+$/.test(stripped));
+        });
+    // Remove trailing empty lines
+    while (cleanLines.length && !cleanLines[cleanLines.length - 1].trim()) cleanLines.pop();
+    const cleaned = cleanLines.join('\n');
+    // Render **bold** spans
+    const parts = cleaned.split(/\*\*(.*?)\*\*/g);
+    return (
+        <span>
+            {parts.map((part, i) =>
+                i % 2 === 1
+                    ? <strong key={i}>{part}</strong>
+                    : part
+            )}
+        </span>
+    );
+};
 
-    const handleShowInGraph = () => {
-        if (onEntityDetect) {
-            if (p.entities && p.entities.order_id) {
-                onEntityDetect(p.entities);
-            } else {
-                const arr = p.full_data?.length ? p.full_data : p.data;
-                if (arr && arr.length > 0) {
-                    // Extract first-column values as IDs for graph
-                    const ids = arr.map(r => Object.values(r)[0]).filter(Boolean);
-                    onEntityDetect(ids);
-                }
-            }
-        }
-    };
+const GraphMessage = ({ payload, onEntityDetect }) => {
+    const [showTable, setShowTable] = useState(true);
 
     return (
         <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {/* Header: title + count */}
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                <span style={{ fontWeight: '700', fontSize: '15px', color: 'var(--text)' }}>{p.title}</span>
-                <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{p.total} result{p.total !== 1 ? 's' : ''} found</span>
-            </div>
+            <div style={{ lineHeight: '1.6' }}>{renderSummary(payload.summary)}</div>
 
-            {/* Data table — shown by default */}
-            {(p.full_data?.length > 0 || p.data?.length > 0) && (
-                <TableView data={p.full_data?.length ? p.full_data : p.data} />
+            {showTable && payload.data && payload.data.length > 0 && (
+                <TableView data={payload.data} />
             )}
 
-            {/* Action buttons */}
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                <button
-                    className="modern-btn"
-                    onClick={() => setShowTable(!showTable)}
-                >
+                <button className="modern-btn" onClick={() => setShowTable(!showTable)}>
                     {showTable ? 'Collapse Table' : 'Expand Table'}
                 </button>
-                <button
-                    className="modern-btn primary"
-                    onClick={handleShowInGraph}
-                >
+                <button className="modern-btn primary" onClick={() => onEntityDetect?.(payload.graph)}>
                     Show in Graph
                 </button>
             </div>
@@ -104,35 +101,27 @@ export default function Chat({ onEntityDetect }) {
                 data = await sendQuery(text);
             }
 
-            if (data.type === 'error' || data.error) {
-                const errorMsg = data.error || data.answer || "Internal error";
-                if (errorMsg.includes("LLM limit exceeded")) {
-                    alert("LLM limit reached. Please try again later.");
-                }
-                setMessages((prev) => [...prev, { id: Date.now().toString(), role: 'ai', type: 'text', content: errorMsg }]);
-            }
-            else if (data.type === 'list' || data.type === 'graph') {
+            if (data.type === 'graph') {
                 setMessages((prev) => [...prev, {
                     id: Date.now().toString(),
                     role: 'ai',
-                    type: 'list',
+                    type: 'graph',
                     content: data
                 }]);
-            }
-            else {
-                setMessages((prev) => [...prev, { id: Date.now().toString(), role: 'ai', type: 'text', content: data.answer || "No matching data found." }]);
-            }
-
-            if ((data.type === 'list' || data.type === 'graph') && onEntityDetect) {
-                if (data.graph && (data.graph.nodes?.length > 0)) {
+                if (onEntityDetect && data.graph?.nodes?.length > 0) {
                     onEntityDetect(data.graph);
-                } else if (data.intent === 'trace_order' || data.entities?.order_id) {
-                    onEntityDetect(data.entities);
                 }
+            } else if (data.type === 'empty') {
+                setMessages((prev) => [...prev, { id: Date.now().toString(), role: 'ai', type: 'text', content: data.message || 'No data found' }]);
+            } else {
+                const errorMsg = data.message || data.error || 'Internal error';
+                setMessages((prev) => [...prev, { id: Date.now().toString(), role: 'ai', type: 'text', content: errorMsg }]);
             }
-
         } catch (err) {
-            setMessages((prev) => [...prev, { id: Date.now().toString(), role: 'ai', type: 'text', content: "Internal connection error. Please try again." }]);
+            const message = err?.name === 'AbortError'
+                ? 'Request timed out. Please try again.'
+                : 'Internal connection error. Please try again.';
+            setMessages((prev) => [...prev, { id: Date.now().toString(), role: 'ai', type: 'text', content: message }]);
         } finally {
             setLoading(false);
             setLoadingText('Processing...');
@@ -195,8 +184,8 @@ export default function Chat({ onEntityDetect }) {
                                 border: !isUser ? '1px solid var(--border)' : 'none'
                             }}>
                                 {msg.type === 'text' && <div>{msg.content}</div>}
-                                {msg.type === 'list' && (
-                                    <ListMessage p={msg.content} msgId={msg.id} onEntityDetect={onEntityDetect} />
+                                {msg.type === 'graph' && (
+                                    <GraphMessage payload={msg.content} onEntityDetect={onEntityDetect} />
                                 )}
                             </div>
                         </div>

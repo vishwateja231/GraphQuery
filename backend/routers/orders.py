@@ -65,7 +65,7 @@ def incomplete_orders(
 # NOTE: specific sub-routes /{order_id}/flow and /{order_id}/items must come
 # BEFORE the generic /{order_id} catch-all, otherwise FastAPI routes them wrong.
 
-@router.get("/{order_id}/flow")
+@router.get("/{order_id}/flow/")
 def order_flow(order_id: str):
     """Full O2C trace for one order."""
     sql = """
@@ -98,7 +98,7 @@ def order_flow(order_id: str):
     return db_query(sql, [order_id])
 
 
-@router.get("/{order_id}/items")
+@router.get("/{order_id}/items/")
 def order_items(order_id: str):
     sql = """
     SELECT oi.*, pr.product_name, pr.product_type, pr.old_sku
@@ -110,7 +110,7 @@ def order_items(order_id: str):
     return db_query(sql, [order_id])
 
 
-@router.get("/{order_id}")
+@router.get("/{order_id}/")
 def get_order(order_id: str):
     rows = db_query("SELECT * FROM orders WHERE order_id = ?", [order_id])
     return rows[0] if rows else {"error": "Not found"}

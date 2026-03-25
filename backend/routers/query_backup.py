@@ -1,18 +1,15 @@
 """
-query.py — Production-grade LLM query pipeline with strict schema enforcement.
+query.py — Production-grade LLM query pipeline (all 13 steps)
 
 Flow:
-1) Schema loaded from schema_enforcer (schema.json / live DB fallback)
+1) Dynamic schema loaded at startup from PostgreSQL
 2) Guardrails — reject non-dataset queries
-3) Groq generates SQL from strict SAP schema prompt
-4) Auto-correct phantom column/table names
-5) SQL validation — allow only SELECT/WITH + LIMIT
-6) Column validation against real SAP schema
-7) Async PostgreSQL execution
-8) On DB error → auto-retry with error context sent back to LLM
-9) Graph builder — {nodes, edges} from result rows
-10) Gemini summarizes if >10 rows
-11) Consistent response: {type, summary, total, data, graph}
+3) Groq generates SQL from live schema (10s timeout)
+4) SQL validation — allow only SELECT/WITH + LIMIT
+5) Async PostgreSQL execution (safe wrapped)
+6) Graph builder — {nodes, edges} from result rows
+7) Gemini summarizes if >10 rows (10s timeout)
+8) Consistent response: {type, summary, total, data, graph}
 """
 from __future__ import annotations
 
@@ -33,7 +30,6 @@ from pydantic import BaseModel  # pyre-ignore[21]
 from config import GEMINI_API_KEY, GROQ_API_KEY  # pyre-ignore[21]
 from database import fetch_all  # pyre-ignore[21]
 import graph_builder  # pyre-ignore[21]
-import schema_enforcer  # pyre-ignore[21]
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s")
 logger = logging.getLogger(__name__)
@@ -49,34 +45,95 @@ def _trunc(s: str, n: int = 100) -> str:
     """Truncate string safely."""
     if not s:
         return ""
-    return (s[:n] + "..") if len(s) > n else s  # type: ignore
+    return (s[:n] + "..") if len(s) > n else s
 
 
 router = APIRouter()
 
-# ── Global schema (SAP-only, loaded from schema_enforcer) ─────────────────────
-# schema_enforcer.load_schema() returns {table: [col, ...]} using schema.json.
-# It filters OUT legacy phantom tables (orders, customers, invoices, etc.).
-LIVE_SCHEMA: Dict[str, Any] = {"tables": {}, "foreign_keys": []}
+# ── Global dynamic schema ─────────────────────────────────────────────────────
+LIVE_SCHEMA: Dict[str, Any] = {}   # populated immediately below
 
 
-def _bootstrap_live_schema() -> None:
-    """Populate LIVE_SCHEMA at startup using schema_enforcer."""
+def load_schema_from_db() -> Dict[str, Any]:
+    """Extract tables, columns and FKs using a direct connection (no pool needed)."""
+    import os
+    schema: Dict[str, Any] = {"tables": {}, "foreign_keys": []}
     try:
-        sap_tables = schema_enforcer.load_schema()
-        LIVE_SCHEMA["tables"] = sap_tables
-        LIVE_SCHEMA["foreign_keys"] = []  # join hints are in schema_enforcer.JOIN_HINTS
-        logger.info("[SCHEMA] Bootstrapped with %d SAP tables via schema_enforcer", len(sap_tables))
+        import psycopg  # pyre-ignore[21]
+        from psycopg.rows import dict_row as _dict_row  # pyre-ignore[21]
+        db_url = os.environ.get("DATABASE_URL", "")
+        if not db_url:
+            raise RuntimeError("DATABASE_URL not set")
+        with psycopg.connect(db_url, row_factory=_dict_row, prepare_threshold=None) as conn:  # pyre-ignore[16]
+            with conn.cursor() as cur:
+                cur.execute("""
+                    SELECT table_name FROM information_schema.tables
+                    WHERE table_schema='public' AND table_type='BASE TABLE'
+                    ORDER BY table_name
+                """)
+                for row in cur.fetchall():
+                    name = dict(row).get("table_name", "")
+                    if name:
+                        schema["tables"][name] = []
+
+                cur.execute("""
+                    SELECT table_name, column_name FROM information_schema.columns
+                    WHERE table_schema='public'
+                    ORDER BY table_name, ordinal_position
+                """)
+                for row in cur.fetchall():
+                    r = dict(row)
+                    t, c = r.get("table_name", ""), r.get("column_name", "")
+                    if t in schema["tables"] and c:
+                        schema["tables"][t].append(c)
+
+                cur.execute("""
+                    SELECT tc.table_name, kcu.column_name,
+                           ccu.table_name AS foreign_table, ccu.column_name AS foreign_column
+                    FROM information_schema.table_constraints tc
+                    JOIN information_schema.key_column_usage kcu
+                      ON tc.constraint_name = kcu.constraint_name
+                    JOIN information_schema.constraint_column_usage ccu
+                      ON ccu.constraint_name = tc.constraint_name
+                    WHERE tc.constraint_type = 'FOREIGN KEY'
+                """)
+                for row in cur.fetchall():
+                    r = dict(row)
+                    schema["foreign_keys"].append({
+                        "from_table": r.get("table_name", ""),
+                        "from_col":   r.get("column_name", ""),
+                        "to_table":   r.get("foreign_table", ""),
+                        "to_col":     r.get("foreign_column", ""),
+                    })
+        logger.info("[SCHEMA] Loaded %d tables from PostgreSQL", len(schema["tables"]))
     except Exception as exc:
-        logger.error("[SCHEMA] Bootstrap failed — using empty schema: %s", exc)
+        logger.error("[SCHEMA] Failed to load schema: %s", exc)
+        schema["tables"] = {
+            "customers":   ["customer_id", "name", "grouping", "is_blocked", "created_date"],
+            "orders":      ["order_id", "customer_id", "order_date", "total_amount", "delivery_status"],
+            "order_items": ["order_id", "line_no", "product_id", "quantity", "net_amount"],
+            "deliveries":  ["delivery_id", "order_id", "ship_date", "picking_status", "goods_status"],
+            "invoices":    ["invoice_id", "order_id", "customer_id", "invoice_date", "total_amount"],
+            "payments":    ["payment_id", "customer_id", "clearing_date", "amount", "is_incoming"],
+            "products":    ["product_id", "product_name", "product_type", "product_group"],
+        }
+    return schema
 
 
-_bootstrap_live_schema()
+# FIX 1: Populate LIVE_SCHEMA at module load time — never empty.
+LIVE_SCHEMA = load_schema_from_db()
 
 
 def format_schema_for_prompt(schema: Dict[str, Any]) -> str:
-    """Delegates to schema_enforcer for a rich schema+join-hints prompt block."""
-    return schema_enforcer.build_schema_prompt()
+    lines: List[str] = []
+    for table, cols in schema.get("tables", {}).items():
+        lines.append(f"TABLE {table} ({', '.join(cols)})")
+    fks = schema.get("foreign_keys", [])
+    if fks:
+        lines.append("\nFOREIGN KEYS:")
+        for fk in fks:
+            lines.append(f"  {fk['from_table']}.{fk['from_col']} -> {fk['to_table']}.{fk['to_col']}")
+    return "\n".join(lines)
 
 
 # ── JSON helpers ──────────────────────────────────────────────────────────────
@@ -145,55 +202,25 @@ DATASET_KEYWORDS = {
     "trace", "flow", "highest", "top", "show", "all",
 }
 
-# ── SQL Prompt Templates (schema injected at call time) ───────────────────────
+# FIX 2: Prompt now instructs the model to return JSON {"sql": "..."}
+# which matches response_format={"type": "json_object"}.
+SQL_PROMPT_TEMPLATE = """You are a PostgreSQL expert.
 
-SQL_PROMPT_TEMPLATE = """You are a PostgreSQL expert working with an SAP Order-to-Cash database.
-
-{column_mapping}
-
-STRICT RULES — VIOLATION WILL CAUSE QUERY FAILURE:
-1. Use ONLY the tables and columns from the SCHEMA below. DO NOT invent column names.
-2. DO NOT use: customer_id, order_id, product_id, invoice_id, payment_id, delivery_id
-   — these columns do NOT exist. Use the MAPPING above instead.
-3. Always use explicit column names. No SELECT *.
-4. All ID/text values in WHERE clauses MUST be wrapped in single quotes:
-   e.g. sold_to_party = '320000085'  NOT  sold_to_party = 320000085
-5. Use the JOIN HINTS in the schema to form correct relationships.
-6. Always include LIMIT 20.
-7. Return ONLY a JSON object: {{"sql": "SELECT ..."}}
-   No markdown, no explanation, no extra keys.
-8. For payments/paid status, ALWAYS JOIN payments_accounts_receivable par ON soh.sold_to_party = par.customer and check par.clearing_date IS NOT NULL.
-
-SCHEMA:
+Database schema:
 {schema}
 
-EXAMPLE OUTPUT:
-{{"sql": "SELECT soh.sales_order, soh.sold_to_party, soh.total_net_amount FROM sales_order_headers soh LIMIT 20"}}
+Rules:
+- Use ONLY the tables and columns listed above. Do NOT hallucinate.
+- Always use proper JOINs for relationships.
+- No SELECT * — always name columns explicitly.
+- Always alias IDs: o.order_id AS order_id, c.customer_id AS customer_id,
+  d.delivery_id AS delivery_id, i.invoice_id AS invoice_id,
+  p.payment_id AS payment_id, pr.product_id AS product_id
+- Always include LIMIT 20.
+- Return ONLY a JSON object with a single key "sql" containing the SQL query.
+  Example: {{"sql": "SELECT c.customer_id AS customer_id FROM customers c LIMIT 20"}}
+- No explanation, no markdown, no extra keys.
 """
-
-SQL_VALIDATOR_PROMPT_TEMPLATE = """You are a strict PostgreSQL SQL validator for a SAP database.
-
-Validate and fix the SQL below so it correctly answers: "{question}"
-
-{column_mapping}
-
-SCHEMA:
-{schema}
-
-SQL TO VALIDATE:
-{sql}
-
-VALIDATION CHECKLIST:
-1. Every table name MUST exist in the SCHEMA. Replace any phantom table with the correct SAP table.
-2. Every column name MUST exist in the SCHEMA. Remove or replace any hallucinated column.
-3. Use MAPPING above to fix wrong column names (e.g. customer_id → customer, order_id → sales_order).
-4. All literal values in WHERE clauses must be single-quoted.
-5. Apply LIMIT 20 if missing.
-6. Use proper LEFT JOINs via the JOIN HINTS for rich results.
-
-Return ONLY: {{"sql": "corrected SQL here"}}
-"""
-
 
 LLM_RATE_SIGNALS = [
     "rate_limit", "rate limit", "quota", "429", "401", "403",
@@ -251,8 +278,9 @@ def _empty_response(message: str = "No data found") -> Dict[str, Any]:
 
 def normalize_question(question: str) -> Tuple[str, Dict[str, str]]:
     """
-    Extract query IDs and normalize the prompt using REAL SAP column names.
-    Adds SQL constraints referencing actual table/column names.
+    Extract query IDs and normalize the prompt for stronger SQL generation.
+    Example:
+    'show customer 320000083 orders' -> includes guardrail: use orders.customer.
     """
     cleaned = re.sub(r"\s+", " ", question).strip()
     hints: Dict[str, str] = {}
@@ -266,31 +294,50 @@ def normalize_question(question: str) -> Tuple[str, Dict[str, str]]:
         hints["order"] = order_match.group(1)
 
     if hints.get("customer"):
-        cid = hints["customer"]
         cleaned += (
-            f"\n\nSQL CONSTRAINT: Filter by customer using "
-            f"`sales_order_headers.sold_to_party = '{cid}'` "
-            f"OR `business_partners.customer = '{cid}'`. "
-            f"Do NOT use customer_id — that column does not exist."
-        )
-    if hints.get("order"):
-        oid = hints["order"]
-        cleaned += (
-            f"\n\nSQL CONSTRAINT: Filter by order using "
-            f"`sales_order_headers.sales_order = '{oid}'`. "
-            f"Do NOT use order_id — that column does not exist."
+            f"\n\nSQL constraint: when filtering orders by customer, "
+            f"use `orders.customer = '{hints['customer']}'` (not customer_id)."
         )
     return cleaned, hints
 
 
+def _extract_known_columns(sql: str) -> Set[str]:
+    tokens = re.findall(r"\b([a-z_][a-z0-9_]*)\b", sql.lower())
+    reserved = {
+        "select", "from", "join", "left", "right", "inner", "outer", "on", "where", "and", "or", "as",
+        "with", "limit", "offset", "group", "by", "order", "desc", "asc", "count", "sum", "avg", "min",
+        "max", "distinct", "case", "when", "then", "else", "end", "not", "null", "is", "having", "true",
+        "false", "in", "like", "ilike", "coalesce",
+    }
+    return {t for t in tokens if t not in reserved and not t.isdigit()}
+
+
 def validate_sql_against_schema(sql: str, schema: Dict[str, Any]) -> Optional[str]:
     """
-    Validate SQL column/table names against the real SAP schema.
-    Delegates to schema_enforcer.validate_sql_columns().
+    Reject invalid table/column references and duplicate aliases for *_id columns.
     """
-    is_valid, bad_tokens = schema_enforcer.validate_sql_columns(sql)
-    if not is_valid:
-        logger.warning("[SQL-VALIDATE] Rejected — unknown identifiers: %s", bad_tokens[:8])
+    tables = schema.get("tables", {})
+    valid_tables = set(tables.keys())
+    valid_columns = {c for cols in tables.values() for c in cols}
+    tokens = _extract_known_columns(sql)
+
+    # Unknown tokens are tolerated if they are aliases/functions, but unknown identifier ratio
+    # should remain low to catch hallucinations.
+    unknown = [t for t in tokens if t not in valid_tables and t not in valid_columns]
+    if len(unknown) > max(5, int(len(tokens) * 0.45)):
+        logger.warning("[SQL] Too many unknown identifiers: %s", unknown[:8])
+        return None
+
+    aliases = re.findall(r"\bas\s+([a-z_][a-z0-9_]*)\b", sql.lower())
+    id_aliases = [a for a in aliases if a.endswith("_id")]
+    if len(id_aliases) != len(set(id_aliases)):
+        logger.warning("[SQL] Duplicate *_id aliases are not allowed")
+        return None
+
+    required_aliases = {"customer_id", "order_id", "delivery_id", "invoice_id", "payment_id", "product_id"}
+    bad_aliases = [a for a in id_aliases if a not in required_aliases]
+    if bad_aliases:
+        logger.warning("[SQL] Invalid ID aliases found: %s", bad_aliases)
         return None
     return sql
 
@@ -302,8 +349,7 @@ def _groq_call(question: str, schema_str: str) -> Dict[str, Any]:
     if not GROQ_API_KEY:
         raise RuntimeError("GROQ_API_KEY not set")
     client = Groq(api_key=GROQ_API_KEY)
-    mapping_str = schema_enforcer.build_column_mapping_prompt()
-    prompt = SQL_PROMPT_TEMPLATE.format(schema=schema_str, column_mapping=mapping_str)
+    prompt = SQL_PROMPT_TEMPLATE.format(schema=schema_str)
     resp = client.chat.completions.create(
         model="llama-3.1-8b-instant",
         response_format={"type": "json_object"},
@@ -312,46 +358,6 @@ def _groq_call(question: str, schema_str: str) -> Dict[str, Any]:
         messages=[
             {"role": "system", "content": prompt},
             {"role": "user", "content": question},
-        ],
-    )
-    content = resp.choices[0].message.content or "{}"
-    return json.loads(content)  # type: ignore[return-value]
-
-
-def _groq_validate_sql_call(question: str, sql: str, schema_str: str) -> Dict[str, Any]:
-    from groq import Groq  # pyre-ignore[21]
-    client = Groq(api_key=GROQ_API_KEY)
-    mapping_str = schema_enforcer.build_column_mapping_prompt()
-    prompt = SQL_VALIDATOR_PROMPT_TEMPLATE.format(
-        schema=schema_str, question=question, sql=sql, column_mapping=mapping_str
-    )
-    resp = client.chat.completions.create(
-        model="llama-3.1-8b-instant",
-        response_format={"type": "json_object"},
-        temperature=0.0,
-        timeout=10,
-        messages=[
-            {"role": "system", "content": prompt},
-            {"role": "user", "content": "Validate and fix the SQL query."},
-        ],
-    )
-    content = resp.choices[0].message.content or "{}"
-    return json.loads(content)  # type: ignore[return-value]
-
-
-def _groq_retry_call(question: str, failed_sql: str, error_msg: str) -> Dict[str, Any]:
-    """Retry SQL generation after a DB execution error, sending error context to LLM."""
-    from groq import Groq  # pyre-ignore[21]
-    client = Groq(api_key=GROQ_API_KEY)
-    retry_prompt = schema_enforcer.build_retry_prompt(question, failed_sql, error_msg)
-    resp = client.chat.completions.create(
-        model="llama-3.1-8b-instant",
-        response_format={"type": "json_object"},
-        temperature=0.0,
-        timeout=12,
-        messages=[
-            {"role": "system", "content": retry_prompt},
-            {"role": "user", "content": "Fix the SQL query based on the error above."},
         ],
     )
     content = resp.choices[0].message.content or "{}"
@@ -400,77 +406,36 @@ def _groq_fallback_summary(question: str, rows: List[Dict[str, Any]]) -> str:
 
 # ── Core pipeline ─────────────────────────────────────────────────────────────
 
-async def generate_sql_from_llm(question: str, retry_context: Optional[Tuple[str, str]] = None) -> Optional[str]:
-    """
-    Generate SQL from LLM with schema enforcement.
-    retry_context: (failed_sql, error_message) — triggers a single retry call.
-    """
-    cache_key = question + ("::retry" if retry_context else "")
-    if not retry_context:
-        cached = _sql_gen_cache.get(cache_key)
-        if cached is not _CACHE_MISS:
-            logger.info("[CACHE] SQL cache hit")
-            return cached  # type: ignore[return-value]
+async def generate_sql_from_llm(question: str) -> Optional[str]:
+    cached = _sql_gen_cache.get(question)
+    # FIX 3: Use _CACHE_MISS so None (invalid SQL) is cached and returned correctly.
+    if cached is not _CACHE_MISS:
+        logger.info("[CACHE] SQL cache hit")
+        return cached  # type: ignore[return-value]
 
     normalized_question, _ = normalize_question(question)
-    schema_str = schema_enforcer.build_schema_prompt()
-
+    schema_str = format_schema_for_prompt(LIVE_SCHEMA)
     try:
-        if retry_context:
-            # ── RETRY PATH: send error + schema back to LLM ──────────────────
-            failed_sql, error_msg = retry_context
-            logger.info("[GROQ] Retry SQL generation after error: %s", _trunc(error_msg, 80))
-            result = await asyncio.wait_for(
-                asyncio.to_thread(_groq_retry_call, normalized_question, failed_sql, error_msg),  # pyre-ignore[6]
-                timeout=14.0,
-            )
-            sql_raw: str = str(result.get("sql", "")).strip()
-            logger.info("[GROQ] Retry SQL: %s", _trunc(sql_raw))
-            sql_validated = sql_raw  # skip second validation pass on retry
-        else:
-            # ── NORMAL PATH ──────────────────────────────────────────────────
-            logger.info("[GROQ] Generating SQL for: %s", _trunc(question, 60))
-            result = await asyncio.wait_for(
-                asyncio.to_thread(_groq_call, normalized_question, schema_str),  # pyre-ignore[6]
-                timeout=12.0,
-            )
-            sql_raw = str(result.get("sql", "")).strip()
-            logger.info("[GROQ] Initial SQL: %s", _trunc(sql_raw))
-
-            logger.info("[GROQ] Validating SQL via LLM Reviewer...")
-            val_result = await asyncio.wait_for(
-                asyncio.to_thread(_groq_validate_sql_call, normalized_question, sql_raw, schema_str),  # pyre-ignore[6]
-                timeout=12.0,
-            )
-            sql_validated = str(val_result.get("sql", sql_raw)).strip()
-            logger.info("[GROQ] Validated SQL: %s", _trunc(sql_validated))
-
+        logger.info("[GROQ] Generating SQL for: %s", _trunc(question, 60))
+        result = await asyncio.wait_for(
+            asyncio.to_thread(_groq_call, normalized_question, schema_str),  # pyre-ignore[6]
+            timeout=12.0,
+        )
+        sql_raw: str = str(result.get("sql", "")).strip()
+        logger.info("[GROQ] Raw SQL: %s", _trunc(sql_raw))
     except asyncio.TimeoutError:
-        raise ValueError("LLM timeout — Groq did not respond within 14 seconds")
+        raise ValueError("LLM timeout — Groq did not respond within 10 seconds")
     except Exception as exc:
         if is_llm_rate_error(str(exc)):
             raise ValueError("LLM limit exceeded")
         logger.warning("[GROQ] Error: %s", exc)
         return None
 
-    # ── Step 6: Auto-correct phantom column/table names ───────────────────────
-    sql_corrected, corrections = schema_enforcer.autocorrect_sql(sql_validated)
-    if corrections:
-        c_list = list(corrections)
-        logger.info("[AUTOCORRECT] %d corrections applied: %s", len(c_list), ", ".join(c_list))
-
-    # ── Step 4 (syntax): Ensure SELECT/WITH + LIMIT ───────────────────────────
-    sql_clean = sanitize_and_validate_sql(sql_corrected)
-
-    # ── Step 5: Column validation against real SAP schema ─────────────────────
-    if sql_clean:
-        sql_final = validate_sql_against_schema(sql_clean, LIVE_SCHEMA)
-    else:
-        sql_final = None
-
-    if not retry_context:
-        _sql_gen_cache.set(cache_key, sql_final)
-    return sql_final
+    sql = sanitize_and_validate_sql(sql_raw)
+    if sql:
+        sql = validate_sql_against_schema(sql, LIVE_SCHEMA)
+    _sql_gen_cache.set(question, sql)
+    return sql
 
 
 async def run_sql(sql: str) -> Any:
@@ -488,8 +453,7 @@ async def run_sql(sql: str) -> Any:
         return result
     except Exception as exc:
         logger.error("[DB] Query failed: %s", exc)
-        # Return structured error so build_query_response can attempt a retry
-        return {"error": "Database error", "details": str(exc), "failed_sql": sql}
+        return {"error": "Database error", "details": str(exc)}
 
 
 async def summarize(question: str, sql: str, rows: List[Dict[str, Any]]) -> str:
@@ -513,60 +477,36 @@ async def summarize(question: str, sql: str, rows: List[Dict[str, Any]]) -> str:
 
 
 async def build_query_response(question: str) -> Dict[str, Any]:
-    """Full pipeline with auto-correct, schema enforcement, and retry-on-error."""
+    """Steps 1-13: Full pipeline."""
     try:
         logger.info("[DEBUG] build_query_response started for: %s", question)
-
+        # Check if question is valid for dataset
         if not is_dataset_question(question):
-            return _error_response("This system only answers SAP Order-to-Cash dataset queries.")
-
-        # ── Step 3+6: Generate SQL (with auto-correct inside) ─────────────────
+            return _error_response("This system only answers dataset-related queries.")
+        
         sql = await generate_sql_from_llm(question)
         logger.info("[DEBUG] SQL generated: %s", sql)
-
+        
         if not sql:
             return _error_response("Could not generate valid SQL for this query.")
-
-        # ── Step 7: Execute SQL ───────────────────────────────────────────────
+        
         db_result = await run_sql(sql)
         logger.info("[DEBUG] DB result received")
-
+        
         if isinstance(db_result, dict) and "error" in db_result:
-            err_dict = db_result  # type: ignore[assignment]
-            error_msg_raw = err_dict.get("details") or err_dict.get("error", "unknown error")
-            failed_sql_raw = err_dict.get("failed_sql", sql)
-            
-            error_msg: str = str(error_msg_raw)
-            failed_sql: str = str(failed_sql_raw)
-
-            logger.warning("[RETRY] DB error '%s'. Retrying SQL generation...", _trunc(error_msg, 80))
-
-            sql_retry = await generate_sql_from_llm(question, retry_context=(failed_sql, error_msg))
-            if sql_retry and sql_retry != sql:
-                logger.info("[RETRY] Retrying with corrected SQL: %s", _trunc(sql_retry))
-                db_result = await run_sql(sql_retry)
-                sql = sql_retry
-
-            if isinstance(db_result, dict) and "error" in db_result:
-                return _error_response(
-                    db_result["error"],
-                    f"{db_result.get('details', '')} | Retry also failed."
-                )
-
+            return _error_response(db_result["error"], db_result.get("details", ""))
+        
         rows: List[Dict[str, Any]] = db_result  # type: ignore[assignment]
         if not rows:
             return _empty_response("No data found")
-
+        
         graph_data: Dict[str, Any] = graph_builder.build_graph(rows)
-        logger.info(
-            "[DEBUG] Graph built: %d nodes, %d edges",
-            len(graph_data.get("nodes", [])),
-            len(graph_data.get("edges", [])),
-        )
-
+        logger.info("[DEBUG] Graph built: %d nodes, %d edges", 
+                    len(graph_data.get("nodes", [])), len(graph_data.get("edges", [])))
+        
         summary_text = await summarize(question, sql, rows)
         logger.info("[DEBUG] Summary generated")
-
+        
         return {
             "type": "graph",
             "summary": summary_text,
