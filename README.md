@@ -1,8 +1,8 @@
-# Dodge AI – Graph-Based Data Modeling and Query System
+# GraphQuery – Graph-Based Data Modeling and Query System
 
 **Turn business data into queryable insights with natural language + graph visualization.**
 
-Dodge AI is a full-stack system that accepts natural language questions, uses LLMs to generate SQL against PostgreSQL (Supabase), executes the query on real relational data, and transforms results into an interactive graph in the UI.
+GraphQuery is a full-stack system that accepts natural language questions, uses LLMs to generate SQL against PostgreSQL (Supabase), executes the query on real relational data, and transforms results into an interactive graph in the UI.
 
 ---
 
